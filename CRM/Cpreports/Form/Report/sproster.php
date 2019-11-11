@@ -120,7 +120,7 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
         'name',
         'street_unit',
         'street_number',
-        'street_name  ',
+        'street_name',
         'county_id',
         'id',
         'location_type_id',
