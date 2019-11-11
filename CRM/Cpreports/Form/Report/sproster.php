@@ -119,6 +119,8 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
         'is_primary',
         'name',
         'street_unit',
+        'street_number',
+        'street_name  ',
         'county_id',
         'id',
         'location_type_id',
@@ -231,6 +233,20 @@ left join civicrm_option_value pt on pt.value = phone_civireport.phone_type_id a
       if (array_key_exists('civicrm_address_state_province_id', $row)) {
         if ($value = $row['civicrm_address_state_province_id']) {
           $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
+        }
+        $entryFound = TRUE;
+      }
+
+      if (array_key_exists('civicrm_contact_indiv_gender_id', $row)) {
+        if ($value = $row['civicrm_contact_indiv_gender_id']) {
+          $rows[$rowNum]['civicrm_contact_indiv_gender_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'gender_id', $value);
+        }
+        $entryFound = TRUE;
+      }
+
+      if (array_key_exists('civicrm_contact_indiv_prefix_id', $row)) {
+        if ($value = $row['civicrm_contact_indiv_prefix_id']) {
+          $rows[$rowNum]['civicrm_contact_indiv_prefix_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $value);
         }
         $entryFound = TRUE;
       }
