@@ -79,6 +79,12 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
             'default' => FALSE,
             'grouping' => 'team-fields',
           ),
+          'nickname' => array(
+            'title' => E::ts('Team Nickname'),
+            'required' => FALSE,
+            'default' => FALSE,
+            'grouping' => 'team-fields',
+          ),
           'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
@@ -88,6 +94,12 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
           'organization_name' => array(
             'title' => E::ts('Team Name'),
             'operator' => 'like',
+            'type' =>	CRM_Utils_Type::T_STRING,
+          ),
+          'nickname' => array(
+            'title' => E::ts('Team Nickname'),
+            'operator' => 'like',
+            'type' =>	CRM_Utils_Type::T_STRING,
           ),
         ),
         'order_bys' => array(
@@ -127,8 +139,20 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
         'country_id',
         'postal_code_suffix',
       ),
+      'filters' => array(
+        'address_street_address',
+      ),
     );
     $this->_columns += $this->getAddressColumns($addressOptions);
+
+    // Remove some unneeded address filters. They clutter the space. Tried but
+    // failed finding options to put in $addressOptions to prevent them from
+    // being added in the first place.
+    unset($this->_columns['civicrm_address']['filters']['address_street_number']);
+    unset($this->_columns['civicrm_address']['filters']['address_street_name']);
+    unset($this->_columns['civicrm_address']['filters']['address_postal_code_suffix']);
+    unset($this->_columns['civicrm_address']['filters']['address_county_id']);
+
     parent::__construct();
 
     $this->customGroup_teamDetails = civicrm_api3('customGroup', 'getSingle', array(
