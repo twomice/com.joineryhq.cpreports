@@ -79,7 +79,7 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
             'default' => FALSE,
             'grouping' => 'team-fields',
           ),
-          'nickname' => array(
+          'nick_name' => array(
             'title' => E::ts('Team Nickname'),
             'required' => FALSE,
             'default' => FALSE,
@@ -96,7 +96,7 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
             'operator' => 'like',
             'type' =>	CRM_Utils_Type::T_STRING,
           ),
-          'nickname' => array(
+          'nick_name' => array(
             'title' => E::ts('Team Nickname'),
             'operator' => 'like',
             'type' =>	CRM_Utils_Type::T_STRING,
