@@ -17,6 +17,31 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
 
 
   function __construct() {
+    // Get metadata for Team_details custom field group, and for 'Team status'
+    // custom field in that group.
+    $this->customGroup_teamDetails = civicrm_api3('customGroup', 'getSingle', array(
+      'name' => 'Team_details',
+    ));
+    $customField_teamStatus = civicrm_api3('customField', 'getSingle', array(
+      'custom_group_id' => $this->customGroup_teamDetails['id'],
+      'name' => 'Team_Status',
+    ));
+
+    // Build a list of options for the nick_name select filter (all existing team nicknames)
+    $nickNameOptions = array();
+    $dao = CRM_Core_DAO::executeQuery('
+        SELECT DISTINCT nick_name
+      FROM civicrm_contact
+      WHERE
+        contact_type = "Organization"
+        AND contact_sub_type LIKE "%team%"
+        AND nick_name > ""
+      ORDER BY nick_name
+    ');
+    while ($dao->fetch()) {
+      $nickNameOptions[$dao->nick_name] = $dao->nick_name;
+    }
+
     $this->_columns = array(
       'civicrm_contact_indiv' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -96,9 +121,17 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
             'operator' => 'like',
             'type' =>	CRM_Utils_Type::T_STRING,
           ),
-          'nick_name' => array(
+          'nick_name_like' => array(
             'title' => E::ts('Team Nickname'),
+            'dbAlias' => 'contact_team_civireport.nick_name',
             'operator' => 'like',
+            'type' =>	CRM_Utils_Type::T_STRING,
+          ),
+          'nick_name_select' => array(
+            'title' => E::ts('Team Nickname'),
+            'dbAlias' => 'contact_team_civireport.nick_name',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $nickNameOptions,
             'type' =>	CRM_Utils_Type::T_STRING,
           ),
         ),
@@ -122,6 +155,23 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
           ),
         ),
         'grouping' => 'contact-fields',
+      ),
+      'custom_team_details' => array(
+        'alias' => $this->customGroup_teamDetails['table_name'],
+        'fields' => array(
+          $customField_teamStatus['column_name'] => array(
+            'title' => E::ts('Team status'),
+          ),
+        ),
+        'filters' => array(
+          $customField_teamStatus['column_name'] => array(
+            'title' => E::ts('Team status'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_BAO_OptionValue::getOptionValuesAssocArray($customField_teamStatus['option_group_id']),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+        'grouping' => 'team-fields',
       ),
     );
     $this->_groupFilter = TRUE;
@@ -154,11 +204,6 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
     unset($this->_columns['civicrm_address']['filters']['address_county_id']);
 
     parent::__construct();
-
-    $this->customGroup_teamDetails = civicrm_api3('customGroup', 'getSingle', array(
-      'name' => 'Team_details',
-    ));
-
   }
 
   function preProcess() {
@@ -181,8 +226,8 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
           AND rt.name_a_b = 'Has_team_volunteer'
         INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact_team']}
           ON {$this->_aliases['civicrm_contact_team']}.id = r.contact_id_a
-        LEFT JOIN {$this->customGroup_teamDetails['table_name']} td
-          ON td.entity_id = {$this->_aliases['civicrm_contact_team']}.id
+        LEFT JOIN {$this->customGroup_teamDetails['table_name']} {$this->_aliases['custom_team_details']}
+          ON {$this->_aliases['custom_team_details']}.entity_id = {$this->_aliases['civicrm_contact_team']}.id
     ";
 
     //used when address field is selected
@@ -207,31 +252,15 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
         LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
           ON {$this->_aliases['civicrm_contact_indiv']}.id = {$this->_aliases['civicrm_phone']}.contact_id
 
-left join civicrm_location_type lt on lt.id = phone_civireport.location_type_id
-left join civicrm_option_value pt on pt.value = phone_civireport.phone_type_id and pt.option_group_id = 35
+        left join civicrm_location_type lt on lt.id = phone_civireport.location_type_id
+        left join civicrm_option_value pt on pt.value = phone_civireport.phone_type_id and pt.option_group_id = 35
       ";
     }
-  }
-
-  function storeWhereHavingClauseArray()  {
-    parent::storeWhereHavingClauseArray();
-
-    $columnName_custom_teamStatus = civicrm_api3('customField', 'getValue', array(
-      'custom_group_id' => $this->customGroup_teamDetails['id'],
-      'name' => 'Team_Status',
-      'return' => 'column_name'
-    ));
-    $this->_whereClauses[] = "ifnull(td.{$columnName_custom_teamStatus}, 'A') IN ('', 'A')";
-    $this->_whereClauses[] = "NOT {$this->_aliases['civicrm_contact_indiv']}.is_deceased";
   }
 
   function groupBy() {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact_indiv']}.id, r.id";
   }
-//
-//  function orderBy() {
-//    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-//  }
 
   function postProcess() {
 
