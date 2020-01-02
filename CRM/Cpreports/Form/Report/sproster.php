@@ -206,11 +206,6 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
-    $this->assign('reportTitle', E::ts('Membership Detail Report'));
-    parent::preProcess();
-  }
-
   function from() {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
     $this->_aliases['civicrm_relationship'] = 'r';
