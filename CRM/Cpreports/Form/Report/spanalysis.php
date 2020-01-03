@@ -398,7 +398,7 @@ class CRM_Cpreports_Form_Report_spanalysis extends CRM_Report_Form {
     //Average duration (based on all Service Providers processed
     $statistics['counts']['average_duration'] = array(
       'title' => ts("Average duration (based on all Service Providers processed)"),
-      'value' => ($statistics['counts']['total_days']['value'] / $statistics['counts']['total_processed']['value']),
+      'value' => ($statistics['counts']['total_processed']['value'] ? ($statistics['counts']['total_days']['value'] / $statistics['counts']['total_processed']['value']) : 0),
       'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
     );
 
