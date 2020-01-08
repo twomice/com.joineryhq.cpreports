@@ -51,9 +51,9 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
             'required' => TRUE,
             'default' => TRUE,
           ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
+          'contact_id' => array(
+            'title' => E::ts('Contact ID'),
+            'name' => 'id',
           ),
           'first_name' => array(
             'title' => E::ts('First Name'),
@@ -72,10 +72,6 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
           ),
           'birth_date' => array(
             'title' => E::ts('Date of Birth'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
           ),
           'id' => array(
             'no_display' => TRUE,

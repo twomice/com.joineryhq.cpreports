@@ -47,6 +47,10 @@ class CRM_Cpreports_Form_Report_spanalysis extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'contact_id' => array(
+            'title' => E::ts('Contact ID'),
+            'name' => 'id',
+          ),
           'first_name' => array(
             'title' => E::ts('First Name'),
           ),
