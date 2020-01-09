@@ -3,12 +3,6 @@ use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
 
-  protected $_addressField = FALSE;
-
-  protected $_emailField = FALSE;
-
-  protected $_summary = NULL;
-
   protected $_customGroupExtends = array('Individual','Contact','Relationship');
 
   protected $customGroup_teamDetails = array();
