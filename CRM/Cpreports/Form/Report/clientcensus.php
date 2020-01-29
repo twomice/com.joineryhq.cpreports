@@ -21,7 +21,6 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
       'custom_group_id' => $this->customGroup_clientParticipation['id'],
       'name' => 'Disposition_Date',
     ));
-dsm($this->customField_dispositionDate, '$customField_dispositionDate');
 
     // Build a list of options for the nick_name select filter (all existing team nicknames)
     $nickNameOptions = array();
