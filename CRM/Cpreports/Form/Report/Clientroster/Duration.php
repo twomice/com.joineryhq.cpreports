@@ -10,7 +10,16 @@ class CRM_Cpreports_Form_Report_Clientroster_Duration extends CRM_Cpreports_Form
     $sqlBase = " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
 
     //Total distinct clients
-    $query = "select count(distinct contact_id_b) from civicrm_relationship where id IN (SELECT {$this->_aliases['civicrm_relationship']}.id {$sqlBase})";
+    $query = "
+      SELECT
+        COUNT(DISTINCT contact_id_b) FROM
+          civicrm_relationship
+        WHERE
+          end_date IS NOT NULL
+          AND id IN (
+            SELECT {$this->_aliases['civicrm_relationship']}.id {$sqlBase}
+          )
+    ";
     $statistics['counts']['total_clients'] = array(
       'title' => ts("Clients terminating during the period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
