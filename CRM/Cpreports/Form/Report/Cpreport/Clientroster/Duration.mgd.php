@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Cpreports_Form_Report_spanalysis',
+    'name' => 'CRM_Cpreports_Form_Report_Cpreport_Clientroster_Duration',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'Service Provider Analysis',
+      'label' => 'Client Roster: Duration',
       'description' => '',
-      'class_name' => 'CRM_Cpreports_Form_Report_spanalysis',
-      'report_url' => 'cpreports/spanalysis',
+      'class_name' => 'CRM_Cpreports_Form_Report_Cpreport_Clientroster_Duration',
+      'report_url' => 'cpreports/clientroster/duration',
       'component' => '',
     ),
   ),

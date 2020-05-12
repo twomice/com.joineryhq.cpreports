@@ -1,15 +1,11 @@
 <?php
 use CRM_Cpreports_ExtensionUtil as E;
 
-class CRM_Cpreports_Form_Report_spanalysis extends CRM_Report_Form {
+class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_Report_Cpreport {
 
   protected $_customGroupExtends = array('Individual','Contact','Relationship');
 
   protected $_customGroupGroupBy = FALSE;
-
-  protected $_serviceDateTo;
-  protected $_serviceDateFrom;
-
 
   function __construct() {
     // Build a list of options for the nick_name select filter (all existing team nicknames)
@@ -140,14 +136,6 @@ class CRM_Cpreports_Form_Report_spanalysis extends CRM_Report_Form {
             'default' => TRUE,
           ),
         ),
-        'filters' => array(
-          'service_dates' => array(
-            'title' => E::ts('Service dates'),
-            'pseudofield' => TRUE,
-            'type' => 	CRM_Utils_Type::T_DATE,
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
         'grouping' => 'relationship-fields',
       ),
       'civicrm_note' => array(
@@ -160,6 +148,7 @@ class CRM_Cpreports_Form_Report_spanalysis extends CRM_Report_Form {
         'grouping' => 'relationship-fields',
       ),
     );
+    $this->_addServiceDatesFilter();
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -192,21 +181,6 @@ class CRM_Cpreports_Form_Report_spanalysis extends CRM_Report_Form {
       -- end from()
 
     ";
-  }
-
-  function storeWhereHavingClauseArray() {
-    parent::storeWhereHavingClauseArray();
-
-    // Convert service_dates 'from' and 'to' params into max start date and min end date, respectively.
-    list($from, $to) = $this->getFromTo($this->_params['service_dates_relative'], $this->_params['service_dates_from'], $this->_params['service_dates_to']);
-    if ($to) {
-      $this->_serviceDateTo = $to;
-      $this->_whereClauses[] = "( start_date <= {$this->_serviceDateTo} )";
-    }
-    if ($from) {
-      $this->_serviceDateFrom = $from;
-      $this->_whereClauses[] = "( end_date IS NULL OR end_date >= {$this->_serviceDateFrom} )";
-    }
   }
 
   function postProcess() {

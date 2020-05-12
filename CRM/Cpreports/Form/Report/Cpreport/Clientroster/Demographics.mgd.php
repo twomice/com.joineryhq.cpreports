@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Cpreports_Form_Report_Clientroster_duration',
+    'name' => 'CRM_Cpreports_Form_Report_Cpreport_Clientroster_Demographics',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'Client Roster: Duration',
+      'label' => 'Client Roster: Demographics',
       'description' => '',
-      'class_name' => 'CRM_Cpreports_Form_Report_Clientroster_Duration',
-      'report_url' => 'cpreports/clientroster/duration',
+      'class_name' => 'CRM_Cpreports_Form_Report_Cpreport_Clientroster_Demographics',
+      'report_url' => 'cpreports/clientroster/demographics',
       'component' => '',
     ),
   ),

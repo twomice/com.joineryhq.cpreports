@@ -1,7 +1,7 @@
 <?php
 use CRM_Cpreports_ExtensionUtil as E;
 
-class CRM_Cpreports_Form_Report_Clientroster extends CRM_Report_Form {
+class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form_Report_Cpreport {
 
   protected $_customGroupExtends = array('Individual','Contact','Relationship');
 
@@ -165,18 +165,6 @@ class CRM_Cpreports_Form_Report_Clientroster extends CRM_Report_Form {
             'default' => TRUE,
           ),
         ),
-        'filters' => array(
-          'start_date' => array(
-            'title' => E::ts('Start Date'),
-            'type' => 	CRM_Utils_Type::T_DATE,
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'end_date' => array(
-            'title' => E::ts('End Date'),
-            'type' => 	CRM_Utils_Type::T_DATE,
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
         'grouping' => 'relationship-fields',
       ),
       'civicrm_address' => array(
@@ -316,6 +304,14 @@ class CRM_Cpreports_Form_Report_Clientroster extends CRM_Report_Form {
         break;
       }
     }
+  }
+
+  protected function _getDateWhereClause($fieldName, $prefix = NULL) {
+    $dateWhereClause = $this->dateClause($fieldName, $this->_params["{$fieldName}_relative"], $this->_params["{$fieldName}_from"], $this->_params["{$fieldName}_to"]);
+    if (!empty($dateWhereClause) && !empty($prefix)) {
+      $dateWhereClause = "{$prefix} {$dateWhereClause}";
+    }
+    return $dateWhereClause;
   }
 
 }
