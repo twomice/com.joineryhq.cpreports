@@ -185,7 +185,10 @@ class CRM_Cpreports_Form_Report_clientduration extends CRM_Report_Form {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
     
     $this->_from = "
-      FROM  civicrm_contact {$this->_aliases['civicrm_contact_indiv']} {$this->_aclFrom}
+      FROM  civicrm_contact {$this->_aliases['civicrm_contact_indiv']}
+        --  aclFrom:
+        {$this->_aclFrom}
+        --  ^^ aclFrom ^^
         INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
           ON {$this->_aliases['civicrm_relationship']}.contact_id_b  = {$this->_aliases['civicrm_contact_indiv']}.id
         INNER JOIN civicrm_relationship_type rt
@@ -193,6 +196,8 @@ class CRM_Cpreports_Form_Report_clientduration extends CRM_Report_Form {
           AND rt.name_a_b = 'Has_team_client'
         INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact_team']}
           ON {$this->_aliases['civicrm_contact_team']}.id = {$this->_aliases['civicrm_relationship']}.contact_id_a
+      LEFT JOIN civicrm_value_health_5
+        ON civicrm_value_health_5.entity_id = {$this->_aliases['civicrm_contact_indiv']}.id
     ";
 
     $this->_from .= "
@@ -203,22 +208,32 @@ class CRM_Cpreports_Form_Report_clientduration extends CRM_Report_Form {
 
   function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
-
-    $diagnosisOrWheres = array();
-    $customDiagnosisField1 = $this->_columns['civicrm_value_health_5']['fields']["custom_{$this->_customFields['diagnosis1']['id']}"];
-    $customDiagnosisField2 = $this->_columns['civicrm_value_health_5']['fields']["custom_{$this->_customFields['diagnosis2']['id']}"];
-    $customDiagnosisField3 = $this->_columns['civicrm_value_health_5']['fields']["custom_{$this->_customFields['diagnosis3']['id']}"];
-    $diagnosisOrWheres[] = $this->whereClause($customDiagnosisField1, $this->_params['diagnosis_op'], $this->_params['diagnosis_value'], NULL, NULL);
-    $diagnosisOrWheres[] = $this->whereClause($customDiagnosisField2, $this->_params['diagnosis_op'], $this->_params['diagnosis_value'], NULL, NULL);
-    $diagnosisOrWheres[] = $this->whereClause($customDiagnosisField3, $this->_params['diagnosis_op'], $this->_params['diagnosis_value'], NULL, NULL);
-
-    if ($this->_params['diagnosis_op'] == 'in') {
-      $andOr = ' OR ';
+    if ($this->_params['diagnosis_value']) {
+      // Apply "any diagnosis" filter
+      $diagnosisOrWheres = array();
+      // Define fields for diagnosis 1, 2, and 3, each as a copy of the 'diagnosis' filter
+      // field; then manually alter the 'dbAlias' property to use the relevant
+      // custom field column.
+      $customDiagnosisField1 =
+      $customDiagnosisField2 =
+      $customDiagnosisField3 =
+        $this->_columns['civicrm_contact_indiv']['filters']['diagnosis'];
+      $customDiagnosisField1['dbAlias'] = "civicrm_value_health_5.{$this->_customFields['diagnosis1']['column_name']}";
+      $customDiagnosisField2['dbAlias'] = "civicrm_value_health_5.{$this->_customFields['diagnosis2']['column_name']}";
+      $customDiagnosisField3['dbAlias'] = "civicrm_value_health_5.{$this->_customFields['diagnosis3']['column_name']}";
+      // Process each of these filter fields into where clauses.
+      $diagnosisOrWheres[] = $this->whereClause($customDiagnosisField1, $this->_params['diagnosis_op'], $this->_params['diagnosis_value'], NULL, NULL);
+      $diagnosisOrWheres[] = $this->whereClause($customDiagnosisField2, $this->_params['diagnosis_op'], $this->_params['diagnosis_value'], NULL, NULL);
+      $diagnosisOrWheres[] = $this->whereClause($customDiagnosisField3, $this->_params['diagnosis_op'], $this->_params['diagnosis_value'], NULL, NULL);
+      // Join these where clauses into a single clause.
+      if ($this->_params['diagnosis_op'] == 'in') {
+        $andOr = ' OR ';
+      }
+      else {
+        $andOr = ' AND ';
+      }
+      $this->_whereClauses[] = '('. implode($andOr, $diagnosisOrWheres) . ')';
     }
-    else {
-      $andOr = ' AND ';
-    }
-    $this->_whereClauses[] = '('. implode($andOr, $diagnosisOrWheres) . ')';
   }
 
   function validate() {
