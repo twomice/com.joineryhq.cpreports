@@ -236,25 +236,6 @@ class CRM_Cpreports_Form_Report_clientduration extends CRM_Report_Form {
     }
   }
 
-  function validate() {
-
-    parent::validate();
-
-    if (!CRM_Utils_Array::value('diagnosis_value', $this->_submitValues)) {
-      $this->_errors['diagnosis_value'] = E::ts('Please specify a value for filter: "Diagnosis 1, 2, or 3"');
-    }
-    if (
-      (
-        !CRM_Utils_Array::value('end_date_from', $this->_submitValues)
-        || CRM_Utils_Array::value('end_date_from', $this->_submitValues) == '0'
-      )
-      && !CRM_Utils_Array::value('end_date_relative', $this->_submitValues)
-    ) {
-      $this->_errors['end_date_relative'] = E::ts('Please specify a value for filter: "End Date"');
-    }
-    return (0 == count($this->_errors));
-  }
-
   function beginPostProcess() {
     parent::beginPostProcess();
 
