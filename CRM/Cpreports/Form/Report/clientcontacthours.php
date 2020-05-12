@@ -445,4 +445,22 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       }
     }
   }
+
+  public function statistics(&$rows) {
+    $statistics = parent::statistics($rows);
+
+    // Get an abbreviated form of the report SQL, and use it to get a count of
+    // distinct team contact_ids
+    $sqlBase = " {$this->_from} {$this->_where}";
+
+    $totalMinutesQuery = "select sum(activity_civireport.duration) $sqlBase";
+    $statistics['counts']['total_duration'] = array(
+      'title' => ts("Total duration"),
+      'value' => CRM_Core_DAO::singleValueQuery($totalMinutesQuery),
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+
+    return $statistics;
+  }
+
 }
