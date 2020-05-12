@@ -1,0 +1,38 @@
+<?php
+use CRM_Cpreports_ExtensionUtil as E;
+
+class CRM_Cpreports_Form_Report_Clientroster_Duration extends CRM_Cpreports_Form_Report_Clientroster {
+
+  public function statistics(&$rows) {
+    $statistics = parent::statistics($rows);
+    // Get an abbreviated form of the report SQL, and use it to get a count of
+    // distinct team contact_ids
+    $sqlBase = " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
+
+    //Total distinct clients
+    $query = "select count(distinct contact_id_b) from civicrm_relationship where id IN (SELECT {$this->_aliases['civicrm_relationship']}.id {$sqlBase})";
+    $statistics['counts']['total_clients'] = array(
+      'title' => ts("Clients terminating during the period"),
+      'value' => CRM_Core_DAO::singleValueQuery($query),
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+
+    //Total composite duration of all clients (days)
+    $query = "select sum({$this->_columns['civicrm_relationship']['fields']['days_active']['dbAlias']}) {$sqlBase}";
+    $statistics['counts']['total_days'] = array(
+      'title' => ts("Total of all client duration (days)"),
+      'value' => CRM_Core_DAO::singleValueQuery($query),
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+
+    //Average duration (based on all Service Providers processed
+    $statistics['counts']['average_duration'] = array(
+      'title' => ts("Average client duration (days)"),
+      'value' => ($statistics['counts']['total_clients']['value'] ? ($statistics['counts']['total_days']['value'] / $statistics['counts']['total_clients']['value']) : 0),
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+
+    return $statistics;
+  }
+
+}

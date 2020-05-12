@@ -1,7 +1,7 @@
 <?php
 use CRM_Cpreports_ExtensionUtil as E;
 
-class CRM_Cpreports_Form_Report_clientduration extends CRM_Report_Form {
+class CRM_Cpreports_Form_Report_Clientroster extends CRM_Report_Form {
 
   protected $_customGroupExtends = array('Individual','Contact','Relationship');
 
@@ -166,6 +166,11 @@ class CRM_Cpreports_Form_Report_clientduration extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
+          'start_date' => array(
+            'title' => E::ts('Start Date'),
+            'type' => 	CRM_Utils_Type::T_DATE,
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
           'end_date' => array(
             'title' => E::ts('End Date'),
             'type' => 	CRM_Utils_Type::T_DATE,
