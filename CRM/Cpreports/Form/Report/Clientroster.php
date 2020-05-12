@@ -179,6 +179,25 @@ class CRM_Cpreports_Form_Report_Clientroster extends CRM_Report_Form {
         ),
         'grouping' => 'relationship-fields',
       ),
+      'civicrm_address' => array(
+        'fields' => array(
+          'city' => array(
+            'title' => E::ts('City'),
+          ),
+          'county_id' => array(
+            'title' => E::ts('County'),
+          ),
+        ),
+        'filters' => array(
+          'county_id' => array(
+            'title' => E::ts('County'),
+            'type' => 	CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_BAO_Address::buildOptions('county_id', NULL, ['state_province_id' => 1042]),
+          ),
+        ),
+        'grouping' => 'relationship-fields',
+      ),
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
