@@ -174,10 +174,18 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
           ),
           'county_id' => array(
             'title' => E::ts('County'),
+            'alter_display' => 'alterCountyID',
           ),
         ),
         'filters' => array(
-          'county_id' => array(
+          // This can't be called 'county_id'. If it is, CRM_Report_Form will
+          // create a chain-select filter with ALL counties, i.e., if we name  it
+          // that then we can't control the available options.
+          // So we name it 'the_county_id' and use the `name` parameter to make
+          // civireport aware of the correct column to use; this doesn't
+          // trigger CRM_Report_Form's "too smart for you" auto-creation of options.
+          'the_county_id' => array(
+            'name' => 'county_id',
             'title' => E::ts('County'),
             'type' => 	CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -211,6 +219,12 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
       LEFT JOIN civicrm_value_health_5
         ON civicrm_value_health_5.entity_id = {$this->_aliases['civicrm_contact_indiv']}.id
     ";
+    if ($this->isTableSelected('civicrm_address')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+          ON {$this->_aliases['civicrm_address']}.is_primary AND {$this->_aliases['civicrm_address']}.contact_id = {$this->_aliases['civicrm_contact_indiv']}.id
+      ";
+    }
 
     $this->_from .= "
       -- end from()
