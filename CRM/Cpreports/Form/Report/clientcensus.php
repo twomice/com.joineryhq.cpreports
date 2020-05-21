@@ -3,6 +3,8 @@ use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
 
+  protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
+
   protected $_customGroupExtends = array('Individual','Contact','Relationship');
 
   protected $customGroup_clientParticipation = array();

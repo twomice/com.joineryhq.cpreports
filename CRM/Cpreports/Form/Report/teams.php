@@ -3,6 +3,7 @@ use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
 
+  protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
   protected $_customGroupExtends = array('Organization','Contact');
   protected $_customGroupGroupBy = FALSE;
 
