@@ -1,18 +1,18 @@
 <?php
+
 use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form_Report_Cpreport {
 
-  protected $_customGroupExtends = array('Individual','Contact','Relationship');
-
+  protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
   protected $_customGroupGroupBy = FALSE;
-
   protected $_customFields = array();
 
   function __construct() {
     // Build a list of options for the nick_name select filter (all existing team nicknames)
     $nickNameOptions = array();
-    $dao = CRM_Core_DAO::executeQuery('
+    $dao = CRM_Core_DAO::executeQuery(
+        '
       SELECT DISTINCT nick_name
       FROM civicrm_contact
       WHERE
@@ -20,7 +20,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         AND contact_sub_type LIKE "%team%"
         AND nick_name > ""
       ORDER BY nick_name
-    ');
+    '
+    );
     while ($dao->fetch()) {
       $nickNameOptions[$dao->nick_name] = $dao->nick_name;
     }
@@ -29,7 +30,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
     $customFieldId_diagnosis1 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_1', 'Health');
     $customFieldId_diagnosis2 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_2', 'Health');
     $customFieldId_diagnosis3 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_3', 'Health');
-    $diagnosisOptions = CRM_Core_BAO_CustomField::buildOptions('custom_'. $customFieldId_diagnosis1);
+    $diagnosisOptions = CRM_Core_BAO_CustomField::buildOptions('custom_' . $customFieldId_diagnosis1);
 
     $this->_customFields['diagnosis1'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis1));
     $this->_customFields['diagnosis2'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis2));
@@ -87,12 +88,12 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
             'pseudofield' => TRUE,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $diagnosisOptions,
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'age' => array(
             'title' => E::ts('Age'),
             'dbAlias' => "TIMESTAMPDIFF(YEAR, contact_indiv_civireport.birth_date, CURDATE())",
-            'type' =>	CRM_Utils_Type::T_INT,
+            'type' => CRM_Utils_Type::T_INT,
           ),
         ),
         'order_bys' => array(
@@ -126,20 +127,20 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
           'organization_name' => array(
             'title' => E::ts('Team Name'),
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_like' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_team_civireport.nick_name',
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_select' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_team_civireport.nick_name',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $nickNameOptions,
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'order_bys' => array(
@@ -165,6 +166,13 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
             'default' => TRUE,
           ),
         ),
+        'filters' => array(
+          'end_date' => array(
+            'title' => E::ts('End date'),
+            'type' => CRM_Utils_Type::T_DATE,
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+        ),
         'grouping' => 'relationship-fields',
       ),
       'civicrm_address' => array(
@@ -187,7 +195,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
           'the_county_id' => array(
             'name' => 'county_id',
             'title' => E::ts('County'),
-            'type' => 	CRM_Utils_Type::T_INT,
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_BAO_Address::buildOptions('county_id', NULL, ['state_province_id' => 1042]),
           ),
@@ -197,13 +205,14 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
+    $this->_addFilterServiceDates();
 
     parent::__construct();
   }
 
   function from() {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
-    
+
     $this->_from = "
       FROM  civicrm_contact {$this->_aliases['civicrm_contact_indiv']}
         --  aclFrom:
@@ -258,15 +267,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
       else {
         $andOr = ' AND ';
       }
-      $this->_whereClauses[] = '('. implode($andOr, $diagnosisOrWheres) . ')';
+      $this->_whereClauses[] = '(' . implode($andOr, $diagnosisOrWheres) . ')';
     }
-  }
-
-  function beginPostProcess() {
-    parent::beginPostProcess();
-
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact_indiv']);
   }
 
   function alterDisplay(&$rows) {
@@ -318,14 +320,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         break;
       }
     }
-  }
-
-  protected function _getDateWhereClause($fieldName, $prefix = NULL) {
-    $dateWhereClause = $this->dateClause($fieldName, $this->_params["{$fieldName}_relative"], $this->_params["{$fieldName}_from"], $this->_params["{$fieldName}_to"]);
-    if (!empty($dateWhereClause) && !empty($prefix)) {
-      $dateWhereClause = "{$prefix} {$dateWhereClause}";
-    }
-    return $dateWhereClause;
   }
 
 }

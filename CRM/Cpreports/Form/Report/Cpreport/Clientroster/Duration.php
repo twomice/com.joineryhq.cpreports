@@ -1,18 +1,13 @@
 <?php
+
 use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_Cpreport_Clientroster_Duration extends CRM_Cpreports_Form_Report_Cpreport_Clientroster {
 
   function __construct() {
     parent::__construct();
-    $this->_addFilterServiceDates();
-    $this->_columns['civicrm_relationship']['filters']['end_date'] = array(
-      'title' => E::ts('End date'),
-      'type' => 	CRM_Utils_Type::T_DATE,
-      'operatorType' => CRM_Report_Form::OP_DATE,
-    );
   }
-  
+
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     // Get an abbreviated form of the report SQL, and provide it as base for statistics queries.

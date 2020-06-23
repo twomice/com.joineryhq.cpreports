@@ -249,22 +249,6 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact_indiv']}.id, r.id";
   }
 
-  function postProcess() {
-
-    $this->beginPostProcess();
-
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact_indiv']);
-    $sql = $this->buildQuery(TRUE);
-
-    $rows = array();
-    $this->buildRows($sql, $rows);
-
-    $this->formatDisplay($rows);
-    $this->doTemplateAssignment($rows);
-    $this->endPostProcess($rows);
-  }
-
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

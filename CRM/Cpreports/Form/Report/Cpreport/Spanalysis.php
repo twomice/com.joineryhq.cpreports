@@ -1,10 +1,10 @@
 <?php
+
 use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_Report_Cpreport {
 
-  protected $_customGroupExtends = array('Individual','Contact','Relationship');
-
+  protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
   protected $_customGroupGroupBy = FALSE;
 
   function __construct() {
@@ -97,20 +97,20 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
           'organization_name' => array(
             'title' => E::ts('Team Name'),
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_like' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_team_civireport.nick_name',
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_select' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_team_civireport.nick_name',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $nickNameOptions,
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'order_bys' => array(
@@ -157,7 +157,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
 
   function from() {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
-    
+
     $this->_from = "
       FROM  civicrm_contact {$this->_aliases['civicrm_contact_indiv']} {$this->_aclFrom}
         INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
@@ -183,24 +183,11 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     ";
   }
 
-  function postProcess() {
-
-    $this->beginPostProcess();
-
+  function beginPostProcess() {
+    parent::beginPostProcess();
     foreach (array('relative', 'from', 'to') as $suffix) {
-      $this->_params["end_date_". $suffix] = $this->_params["start_date_". $suffix] = $this->_params["service_dates_". $suffix];
+      $this->_params["end_date_" . $suffix] = $this->_params["start_date_" . $suffix] = $this->_params["service_dates_" . $suffix];
     }
-
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact_indiv']);
-    $sql = $this->buildQuery(TRUE);
-
-    $rows = array();
-    $this->buildRows($sql, $rows);
-
-    $this->formatDisplay($rows);
-    $this->doTemplateAssignment($rows);
-    $this->endPostProcess($rows);
   }
 
   function alterDisplay(&$rows) {
