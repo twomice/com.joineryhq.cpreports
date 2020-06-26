@@ -534,6 +534,14 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     $this->_addDemographicStats($statistics, $sqlBase);
 
     if ($this->isTableSelected($this->_tempTableName)) {
+      // Distinct carepartners count
+      $query = "SELECT COUNT(DISTINCT carepartner_contact_id) FROM {$this->_tempTableName}";
+      $statistics['counts']['total_carepartners'] = array(
+        'title' => E::ts('Total distinct CarePartners'),
+        'value' => CRM_Core_DAO::singleValueQuery($query),
+        'type' => CRM_Utils_Type::T_INT // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      );
+
       // Section header
       $statistics['counts']['relationship_types_blank'] = array(
         'title' => E::ts('CarePartner relationship types'),
