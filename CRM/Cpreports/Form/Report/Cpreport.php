@@ -191,8 +191,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
 
     // Total distinct client contacts.
     $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) {$sqlBase}";
-    $statistics['counts']['total_days'] = array(
-      'title' => ts("Total  distinct clients"),
+    $statistics['counts']['total_clients'] = array(
+      'title' => ts("Total distinct clients"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
     );
