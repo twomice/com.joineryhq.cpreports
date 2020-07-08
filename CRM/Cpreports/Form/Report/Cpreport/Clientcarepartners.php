@@ -104,78 +104,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_contact_team' => array(
-        'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name'),
-            'required' => FALSE,
-            'default' => TRUE,
-            'grouping' => 'team-fields',
-          ),
-          'nick_name' => array(
-            'title' => E::ts('Team Nickname'),
-            'required' => FALSE,
-            'default' => TRUE,
-            'grouping' => 'team-fields',
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name'),
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'nick_name_like' => array(
-            'title' => E::ts('Team Nickname'),
-            'dbAlias' => 'contact_team_civireport.nick_name',
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'nick_name_select' => array(
-            'title' => E::ts('Team Nickname'),
-            'dbAlias' => 'contact_team_civireport.nick_name',
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $nickNameOptions,
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'order_bys' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name'),
-          ),
-        ),
-        'grouping' => 'contact-fields',
-      ),
-      'civicrm_relationship' => array(
-        'fields' => array(
-          'start_date' => array(
-            'title' => E::ts('Start Date'),
-            'default' => TRUE,
-          ),
-          'end_date' => array(
-            'title' => E::ts('End Date'),
-            'default' => TRUE,
-          ),
-          'days_active' => array(
-            'title' => E::ts('Days Active'),
-            'dbAlias' => 'IF (start_date IS NOT NULL, DATEDIFF(IFNULL(end_date, NOW()), start_date), "")',
-            'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'end_date' => array(
-            'title' => E::ts('End date'),
-            'type' => CRM_Utils_Type::T_DATE,
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-        'grouping' => 'relationship-fields',
-      ),
       'civicrm_address' => array(
         'fields' => array(
           'city' => array(
@@ -220,9 +148,15 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
-    $this->_addFilterServiceDates();
+    $this->_addFilterParticipationDates();
 
     parent::__construct();
+    $this->_columns['civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
+    $this->_columns['civicrm_value_participation_6']['fields']['days_participated'] = [
+      'title' => E::ts('Days Participated'),
+      'dbAlias' => 'IF (alias_civicrm_value_participation_6_civireport.service_began_3 IS NOT NULL, DATEDIFF(IFNULL(alias_civicrm_value_participation_6_civireport.disposition_date_46, NOW()), alias_civicrm_value_participation_6_civireport.service_began_3), "")',
+      'default' => TRUE,
+    ];
   }
 
   function from() {
@@ -233,13 +167,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
         --  aclFrom:
         {$this->_aclFrom}
         --  ^^ aclFrom ^^
-        INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
-          ON {$this->_aliases['civicrm_relationship']}.contact_id_b  = {$this->_aliases['civicrm_contact_indiv']}.id
-        INNER JOIN civicrm_relationship_type rt
-          ON {$this->_aliases['civicrm_relationship']}.relationship_type_id = rt.id
-          AND rt.name_a_b = 'Has_team_client'
-        INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact_team']}
-          ON {$this->_aliases['civicrm_contact_team']}.id = {$this->_aliases['civicrm_relationship']}.contact_id_a
       LEFT JOIN civicrm_value_health_5
         ON civicrm_value_health_5.entity_id = {$this->_aliases['civicrm_contact_indiv']}.id
     ";
@@ -255,7 +182,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
           ON {$this->_aliases['civicrm_contact_indiv']}.id = {$this->_aliases[$this->_tempTableName]}.client_contact_id
       ";
     }
-
+    $this->_addParticipationDatesFrom('civicrm_contact_indiv');
     $this->_from .= "
       -- end from()
 
@@ -440,19 +367,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
         );
         $rows[$rowNum]['civicrm_contact_indiv_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_indiv_sort_name_hover'] = E::ts("View Contact Summary for this Contact.");
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_contact_team_organization_name', $row)
-        && $rows[$rowNum]['civicrm_contact_team_organization_name']
-        && array_key_exists('civicrm_contact_team_id', $row)
-      ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
-          'reset=1&cid=' . $row['civicrm_contact_team_id'],
-          $this->_absoluteUrl
-        );
-        $rows[$rowNum]['civicrm_contact_team_organization_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_team_organization_name_hover'] = E::ts("View Contact Summary for this Contact.");
         $entryFound = TRUE;
       }
 

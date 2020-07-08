@@ -8,6 +8,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
   protected $_serviceDateTo;
   protected $_serviceDateFrom;
+  protected $_participationDateTo;
+  protected $_participationDateFrom;
 
   function beginPostProcess() {
     parent::beginPostProcess();
@@ -29,6 +31,31 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     if ($from) {
       $this->_serviceDateFrom = $from;
       $this->_whereClauses[] = "( {$this->_aliases['civicrm_relationship']}.end_date IS NULL OR {$this->_aliases['civicrm_relationship']}.end_date >= {$this->_serviceDateFrom} )";
+    }
+
+    // Handle 'participation_dates' filter:
+    // Convert participation_dates 'from' and 'to' params into max start date and min end date, respectively.
+    list($from, $to) = $this->getFromTo($this->_params['participation_dates_relative'], $this->_params['participation_dates_from'], $this->_params['participation_dates_to']);
+    if ($to) {
+      $this->_participationDateTo = $to;
+      $this->_whereClauses[] = "( {$this->_aliases['filter_civicrm_value_participation_6']}.service_began_3 <= {$this->_participationDateTo} )";
+    }
+    if ($from) {
+      $this->_participationDateFrom = $from;
+      $this->_whereClauses[] = "( {$this->_aliases['filter_civicrm_value_participation_6']}.disposition_date_46 IS NULL OR {$this->_aliases['filter_civicrm_value_participation_6']}.disposition_date_46 >= {$this->_participationDateFrom} )";
+    }
+  }
+
+  function _addParticipationDatesFrom($contactTableName) {
+    if (
+      $this->isTableSelected('filter_civicrm_value_participation_6')
+      || !empty($this->_params['participation_dates_from'])
+      || !empty($this->_params['participation_dates_to'])
+    ) {
+      $this->_from .= "
+        LEFT JOIN civicrm_value_participation_6 {$this->_aliases['filter_civicrm_value_participation_6']}
+          ON {$this->_aliases['filter_civicrm_value_participation_6']}.entity_id = {$this->_aliases[$contactTableName]}.id
+      ";
     }
   }
 
@@ -59,6 +86,21 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   function _addFilterServiceDates() {
     $this->_columns['civicrm_relationship']['filters']['service_dates'] = array(
       'title' => E::ts('Service dates'),
+      'pseudofield' => TRUE,
+      'type' => CRM_Utils_Type::T_DATE,
+      'operatorType' => CRM_Report_Form::OP_DATE,
+    );
+  }
+
+  /**
+   * Add filter for service_dates to $this->_columns.
+   */
+  function _addFilterParticipationDates() {
+    $this->_columns['filter_civicrm_value_participation_6'] = [
+      'alias' => 'civicrm_value_participation_6',
+    ];
+    $this->_columns['filter_civicrm_value_participation_6']['filters']['participation_dates'] = array(
+      'title' => E::ts('Participation dates'),
       'pseudofield' => TRUE,
       'type' => CRM_Utils_Type::T_DATE,
       'operatorType' => CRM_Report_Form::OP_DATE,
