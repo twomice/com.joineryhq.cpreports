@@ -4,7 +4,7 @@ use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form_Report_Cpreport {
 
-  protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
+  protected $_customGroupExtends = array('Individual', 'Contact');
   protected $_customGroupGroupBy = FALSE;
   protected $_customFields = array();
 
@@ -107,20 +107,18 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         'dao' => 'CRM_Contact_DAO_Contact',
         'fields' => array(
           'organization_name' => array(
-            'title' => E::ts('Team Name'),
+            'title' => E::ts('Team Name(s)'),
             'required' => FALSE,
             'default' => TRUE,
             'grouping' => 'team-fields',
+            'dbAlias'  => "GROUP_CONCAT(DISTINCT contact_team_civireport.organization_name ORDER BY contact_team_civireport.organization_name DESC SEPARATOR '<BR /> ')",
           ),
           'nick_name' => array(
-            'title' => E::ts('Team Nickname'),
+            'title' => E::ts('Team Nickname(s)'),
             'required' => FALSE,
             'default' => TRUE,
             'grouping' => 'team-fields',
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
+            'dbAlias'  => "GROUP_CONCAT(DISTINCT contact_team_civireport.nick_name ORDER BY contact_team_civireport.nick_name DESC SEPARATOR '<BR /> ')",
           ),
         ),
         'filters' => array(
@@ -143,37 +141,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
-        'order_bys' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name'),
-          ),
-        ),
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_relationship' => array(
-        'fields' => array(
-          'start_date' => array(
-            'title' => E::ts('Start Date'),
-            'default' => TRUE,
-          ),
-          'end_date' => array(
-            'title' => E::ts('End Date'),
-            'default' => TRUE,
-          ),
-          'days_active' => array(
-            'title' => E::ts('Days Active'),
-            'dbAlias' => 'IF (start_date IS NOT NULL, DATEDIFF(IFNULL(end_date, NOW()), start_date), "")',
-            'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'end_date' => array(
-            'title' => E::ts('End date'),
-            'type' => CRM_Utils_Type::T_DATE,
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-        'grouping' => 'relationship-fields',
       ),
       'civicrm_address' => array(
         'fields' => array(
@@ -200,14 +168,22 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
             'options' => CRM_Core_BAO_Address::buildOptions('county_id', NULL, ['state_province_id' => 1042]),
           ),
         ),
-        'grouping' => 'relationship-fields',
+        'grouping' => 'address-fields',
       ),
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
-    $this->_addFilterServiceDates();
+    $this->_addFilterParticipationDates();
 
     parent::__construct();
+
+    $this->_columns['civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
+    $this->_columns['civicrm_value_participation_6']['fields']['days_participated'] = [
+      'title' => E::ts('Days Participated'),
+      'dbAlias' => 'IF (alias_civicrm_value_participation_6_civireport.service_began_3 IS NOT NULL, DATEDIFF(IFNULL(alias_civicrm_value_participation_6_civireport.disposition_date_46, NOW()), alias_civicrm_value_participation_6_civireport.service_began_3), "")',
+      'default' => FALSE,
+    ];
+
   }
 
   function from() {
@@ -218,31 +194,49 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         --  aclFrom:
         {$this->_aclFrom}
         --  ^^ aclFrom ^^
-        INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
-          ON {$this->_aliases['civicrm_relationship']}.contact_id_b  = {$this->_aliases['civicrm_contact_indiv']}.id
-        INNER JOIN civicrm_relationship_type rt
-          ON {$this->_aliases['civicrm_relationship']}.relationship_type_id = rt.id
-          AND rt.name_a_b = 'Has_team_client'
-        INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact_team']}
-          ON {$this->_aliases['civicrm_contact_team']}.id = {$this->_aliases['civicrm_relationship']}.contact_id_a
       LEFT JOIN civicrm_value_health_5
         ON civicrm_value_health_5.entity_id = {$this->_aliases['civicrm_contact_indiv']}.id
     ";
+    if ($this->isTableSelected('civicrm_value_participation_6')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_value_participation_6 {$this->_aliases['civicrm_value_participation_6']}
+          ON {$this->_aliases['civicrm_value_participation_6']}.entity_id = {$this->_aliases['civicrm_contact_indiv']}.id
+      ";
+    }
+    if ($this->isTableSelected('civicrm_contact_team')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_relationship r
+          ON r.contact_id_b  = {$this->_aliases['civicrm_contact_indiv']}.id AND r.relationship_type_id = 18
+        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact_team']}
+          ON {$this->_aliases['civicrm_contact_team']}.id = r.contact_id_a
+      ";
+    }
     if ($this->isTableSelected('civicrm_address')) {
       $this->_from .= "
         LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
           ON {$this->_aliases['civicrm_address']}.is_primary AND {$this->_aliases['civicrm_address']}.contact_id = {$this->_aliases['civicrm_contact_indiv']}.id
       ";
     }
-
+    $this->_addParticipationDatesFrom('civicrm_contact_indiv');
     $this->_from .= "
       -- end from()
 
     ";
   }
 
+  function groupBy() {
+    if ($this->isTableSelected('civicrm_contact_team')) {
+      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact_indiv']}.id";
+    }
+  }
+
+
   function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
+
+    // Ensure we only return individuals
+    $this->_whereClauses[] = "{$this->_aliases['civicrm_contact_indiv']}.contact_type = 'Individual'";
+
     if ($this->_params['diagnosis_value']) {
       // Apply "any diagnosis" filter
       $diagnosisOrWheres = array();
@@ -300,19 +294,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         );
         $rows[$rowNum]['civicrm_contact_indiv_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_indiv_sort_name_hover'] = E::ts("View Contact Summary for this Contact.");
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_contact_team_organization_name', $row) &&
-        $rows[$rowNum]['civicrm_contact_team_organization_name'] &&
-        array_key_exists('civicrm_contact_team_id', $row)
-      ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
-          'reset=1&cid=' . $row['civicrm_contact_team_id'],
-          $this->_absoluteUrl
-        );
-        $rows[$rowNum]['civicrm_contact_team_organization_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_team_organization_name_hover'] = E::ts("View Contact Summary for this Contact.");
         $entryFound = TRUE;
       }
 
