@@ -23,7 +23,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
 
     // Handle 'service_dates' filter:
     // Convert service_dates 'from' and 'to' params into max start date and min end date, respectively.
-    list($from, $to) = $this->getFromTo($this->_params['service_dates_relative'], $this->_params['service_dates_from'], $this->_params['service_dates_to']);
+    list($from, $to) = $this->getFromTo($this->_params['service_dates_relative'] ?? NULL, $this->_params['service_dates_from'] ?? NULL, $this->_params['service_dates_to'] ?? NULL);
     if ($to) {
       $this->_serviceDateTo = $to;
       $this->_whereClauses[] = "( {$this->_aliases['civicrm_relationship']}.start_date <= {$this->_serviceDateTo} )";
@@ -35,7 +35,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
 
     // Handle 'participation_dates' filter:
     // Convert participation_dates 'from' and 'to' params into max start date and min end date, respectively.
-    list($from, $to) = $this->getFromTo($this->_params['participation_dates_relative'], $this->_params['participation_dates_from'], $this->_params['participation_dates_to']);
+    list($from, $to) = $this->getFromTo($this->_params['participation_dates_relative'] ?? NULL, $this->_params['participation_dates_from'] ?? NULL, $this->_params['participation_dates_to'] ?? NULL);
     if ($to) {
       $this->_participationDateTo = $to;
       $this->_whereClauses[] = "( {$this->_aliases['filter_civicrm_value_participation_6']}.service_began_3 <= {$this->_participationDateTo} )";
