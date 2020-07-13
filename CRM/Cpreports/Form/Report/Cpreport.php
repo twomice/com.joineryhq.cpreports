@@ -97,13 +97,124 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
    */
   function _addFilterParticipationDates() {
     $this->_columns['filter_civicrm_value_participation_6'] = [
-      'alias' => 'civicrm_value_participation_6',
+      'alias' => 'filter_civicrm_value_participation_6',
     ];
     $this->_columns['filter_civicrm_value_participation_6']['filters']['participation_dates'] = array(
       'title' => E::ts('Participation dates'),
       'pseudofield' => TRUE,
       'type' => CRM_Utils_Type::T_DATE,
       'operatorType' => CRM_Report_Form::OP_DATE,
+    );
+  }
+
+  /**
+   * Add a row for "active at start of date range" to $statistics.
+   */
+  function _addStatisticParticipationActiveStart(&$statistics, $sqlBase, $titlePrefix = '') {
+    //Participation active at start of analysis period
+    if (empty($this->_aliases['civicrm_contact_indiv'])) {
+      return;
+    }
+    $activeStartWhere = "";
+    if ($this->_participationDateFrom) {
+      $activeStartWhere = "service_began_3 < {$this->_participationDateFrom} AND ";
+      $query = "select count(distinct entity_id) from civicrm_value_participation_6 where $activeStartWhere entity_id IN (SELECT {$this->_aliases['civicrm_contact_indiv']}.id {$sqlBase})";
+      // dsm($query, "-- active start\n");
+      $activeStartCount = CRM_Core_DAO::singleValueQuery($query);
+    }
+    else {
+      // No "from" date means the beginning of time, when zero volunteers were active.
+      $activeStartCount = 0;
+      // dsm(0, 'active_start');
+    }
+    $statistics['counts']['participation_active_start'] = array(
+      'title' => ts("{$titlePrefix}Participation active at start of analysis period"),
+      'value' => $activeStartCount,
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+  }
+
+  /**
+   * Add a row for "ended during date range" to $statistics.
+   */
+  function _addStatisticParticipationEndedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
+    //Participation ended during analysis period
+    if (empty($this->_aliases['civicrm_contact_indiv'])) {
+      return;
+    }
+    //Participation ended during analysis period
+    if ($this->_participationDateTo) {
+      $endedDuringWhere = "disposition_date_46 < {$this->_participationDateTo}";
+    }
+    else {
+      $endedDuringWhere = "disposition_date_46 IS NOT NULL";
+    }
+    $query = "
+      select count(distinct entity_id)
+      from civicrm_value_participation_6
+      where $endedDuringWhere AND entity_id IN (
+        SELECT {$this->_aliases['civicrm_contact_indiv']}.id {$sqlBase}
+      )
+    ";
+    // dsm($query, "-- ended during\n");
+    $statistics['counts']['participation_ended_during'] = array(
+      'title' => ts("{$titlePrefix}Participation ended during analysis period"),
+      'value' => CRM_Core_DAO::singleValueQuery($query),
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+  }
+
+  /**
+   * Add a row for "started during date range" to $statistics.
+   */
+  function _addStatisticParticipationStartedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
+    //Participation started during analysis period
+    if (empty($this->_aliases['civicrm_contact_indiv'])) {
+      return;
+    }
+    //Participation started during analysis period
+    if ($this->_participationDateFrom) {
+      $startedDuringWhere = "service_began_3 > {$this->_participationDateTo}";
+    }
+    else {
+      $startedDuringWhere = "service_began_3 IS NOT NULL";
+    }
+    $query = "
+      select count(distinct entity_id)
+      from civicrm_value_participation_6
+      where $startedDuringWhere AND entity_id IN (
+        SELECT {$this->_aliases['civicrm_contact_indiv']}.id {$sqlBase}
+      )
+    ";
+    $statistics['counts']['participation_started_during'] = array(
+      'title' => ts("{$titlePrefix}Participation started during analysis period"),
+      'value' => CRM_Core_DAO::singleValueQuery($query),
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+  }
+
+  /**
+   * Add a row for "active through end of date range" to $statistics.
+   */
+  function _addStatisticParticipationActiveEnd(&$statistics, $sqlBase, $titlePrefix = '') {
+    //Participation active through end of analysis period
+    if (empty($this->_aliases['civicrm_contact_indiv'])) {
+      return;
+    }
+    //Participation active through end of analysis period
+    if ($this->_participationDateTo) {
+      $activeEndWhere = "(disposition_date_46 IS NULL OR disposition_date_46 > {$this->_participationDateTo}) AND ";
+    }
+    else {
+      // No "to" date means the end of time, when only clients with no disposition_date will be active
+      $activeEndWhere = "(disposition_date_46 IS NULL) AND ";
+    }
+    $query = "select count(distinct entity_id) from civicrm_value_participation_6 where $activeEndtWhere entity_id IN (SELECT {$this->_aliases['civicrm_contact_indiv']}.id {$sqlBase})";
+    // dsm($query, "-- active end\n");
+    $statistics['counts']['participation_active_end'] = array(
+      'title' => ts("{$titlePrefix}Participation active at end of analysis period"),
+      'value' => CRM_Core_DAO::singleValueQuery($query),
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
     );
   }
 
@@ -244,14 +355,14 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
 
     // Section header
     $statistics['counts']['transition_summary_blank'] = array(
-      'title' => E::ts('Client Transition Summary'),
+      'title' => E::ts('Client Participation Summary'),
       'value' => '',
       'type' => CRM_Utils_Type::T_STRING // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
     );
-    $this->_addStatisticServiceActiveStart($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticServiceEndedDuring($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticServiceStartedDuring($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticServiceActiveEnd($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticParticipationActiveStart($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticParticipationEndedDuring($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticParticipationStartedDuring($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticParticipationActiveEnd($statistics, $sqlBase, $indentPrefix);
 
     // Show disposition stats only if 'disposition' field is displayed
     // (Because then we can be sure the correct custom_value table is joined

@@ -151,8 +151,9 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     $this->_addFilterParticipationDates();
 
     parent::__construct();
-    $this->_columns['civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
-    $this->_columns['civicrm_value_participation_6']['fields']['days_participated'] = [
+    $this->_columns['alias_civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
+    $this->_columns['alias_civicrm_value_participation_6']['grouping'] = 'civicrm_value_participation_6';
+    $this->_columns['alias_civicrm_value_participation_6']['fields']['days_participated'] = [
       'title' => E::ts('Days Participated'),
       'dbAlias' => 'IF (alias_civicrm_value_participation_6_civireport.service_began_3 IS NOT NULL, DATEDIFF(IFNULL(alias_civicrm_value_participation_6_civireport.disposition_date_46, NOW()), alias_civicrm_value_participation_6_civireport.service_began_3), "")',
       'default' => TRUE,
@@ -188,6 +189,18 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
 
     ";
   }
+
+  function _addParticipationDatesFrom($contactTableName) {
+    parent::_addParticipationDatesFrom($contactTableName);
+    if ($this->isTableSelected('alias_civicrm_value_participation_6')) {
+      $this->_from .= "
+        -- fsda
+        LEFT JOIN civicrm_value_participation_6 {$this->_aliases['alias_civicrm_value_participation_6']}
+          ON {$this->_aliases['alias_civicrm_value_participation_6']}.entity_id = {$this->_aliases[$contactTableName]}.id
+      ";
+    }
+  }
+
 
   /**
    * Build order by clause, appending "_tempTableName.carepartner_sort_name"

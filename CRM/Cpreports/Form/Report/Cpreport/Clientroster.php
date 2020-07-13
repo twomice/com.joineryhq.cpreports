@@ -177,8 +177,9 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
 
     parent::__construct();
 
-    $this->_columns['civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
-    $this->_columns['civicrm_value_participation_6']['fields']['days_participated'] = [
+    $this->_columns['alias_civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
+    $this->_columns['alias_civicrm_value_participation_6']['grouping'] = 'civicrm_value_participation_6';
+    $this->_columns['alias_civicrm_value_participation_6']['fields']['days_participated'] = [
       'title' => E::ts('Days Participated'),
       'dbAlias' => 'IF (alias_civicrm_value_participation_6_civireport.service_began_3 IS NOT NULL, DATEDIFF(IFNULL(alias_civicrm_value_participation_6_civireport.disposition_date_46, NOW()), alias_civicrm_value_participation_6_civireport.service_began_3), "")',
       'default' => FALSE,
@@ -197,10 +198,10 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
       LEFT JOIN civicrm_value_health_5
         ON civicrm_value_health_5.entity_id = {$this->_aliases['civicrm_contact_indiv']}.id
     ";
-    if ($this->isTableSelected('civicrm_value_participation_6')) {
+    if ($this->isTableSelected('alias_civicrm_value_participation_6')) {
       $this->_from .= "
-        LEFT JOIN civicrm_value_participation_6 {$this->_aliases['civicrm_value_participation_6']}
-          ON {$this->_aliases['civicrm_value_participation_6']}.entity_id = {$this->_aliases['civicrm_contact_indiv']}.id
+        LEFT JOIN civicrm_value_participation_6 {$this->_aliases['alias_civicrm_value_participation_6']}
+          ON {$this->_aliases['alias_civicrm_value_participation_6']}.entity_id = {$this->_aliases['civicrm_contact_indiv']}.id
       ";
     }
     if ($this->isTableSelected('civicrm_contact_team')) {
