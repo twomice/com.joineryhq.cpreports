@@ -247,10 +247,10 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     // distinct team contact_ids
     $sqlBase = " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
 
-    $this->_addStatisticActiveStart($statistics, $sqlBase);
-    $this->_addStatisticActiveEnd($statistics, $sqlBase);
-    $this->_addStatisticStartedDuring($statistics, $sqlBase);
-    $this->_addStatisticEndedDuring($statistics, $sqlBase);
+    $this->_addStatisticServiceActiveStart($statistics, $sqlBase);
+    $this->_addStatisticServiceActiveEnd($statistics, $sqlBase);
+    $this->_addStatisticServiceStartedDuring($statistics, $sqlBase);
+    $this->_addStatisticServiceEndedDuring($statistics, $sqlBase);
 
 
     //Net change in active Service Providers

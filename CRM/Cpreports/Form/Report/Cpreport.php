@@ -110,7 +110,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "active at start of date range" to $statistics.
    */
-  function _addStatisticActiveStart(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticServiceActiveStart(&$statistics, $sqlBase, $titlePrefix = '') {
     //Relationships active at start of analysis period
     if (empty($this->_aliases['civicrm_relationship'])) {
       return;
@@ -137,8 +137,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "ended during date range" to $statistics.
    */
-  function _addStatisticEndedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
-    //Relationships active at start of analysis period
+  function _addStatisticServiceEndedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
+    //Relationships ended during analysis period
     if (empty($this->_aliases['civicrm_relationship'])) {
       return;
     }
@@ -171,8 +171,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "started during date range" to $statistics.
    */
-  function _addStatisticStartedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
-    //Relationships active at start of analysis period
+  function _addStatisticServiceStartedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
+    //Relationships started during analysis period
     if (empty($this->_aliases['civicrm_relationship'])) {
       return;
     }
@@ -204,8 +204,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "active through end of date range" to $statistics.
    */
-  function _addStatisticActiveEnd(&$statistics, $sqlBase, $titlePrefix = '') {
-    //Relationships active at start of analysis period
+  function _addStatisticServiceActiveEnd(&$statistics, $sqlBase, $titlePrefix = '') {
+    //Relationships active through end of analysis period
     if (empty($this->_aliases['civicrm_relationship'])) {
       return;
     }
@@ -248,10 +248,10 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       'value' => '',
       'type' => CRM_Utils_Type::T_STRING // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
     );
-    $this->_addStatisticActiveStart($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticEndedDuring($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticStartedDuring($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticActiveEnd($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticServiceActiveStart($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticServiceEndedDuring($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticServiceStartedDuring($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticServiceActiveEnd($statistics, $sqlBase, $indentPrefix);
 
     // Show disposition stats only if 'disposition' field is displayed
     // (Because then we can be sure the correct custom_value table is joined
