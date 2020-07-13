@@ -209,8 +209,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       // No "to" date means the end of time, when only clients with no disposition_date will be active
       $activeEndWhere = "(disposition_date_46 IS NULL) AND ";
     }
-    $query = "select count(distinct entity_id) from civicrm_value_participation_6 where $activeEndtWhere entity_id IN (SELECT {$this->_aliases['civicrm_contact_indiv']}.id {$sqlBase})";
-    // dsm($query, "-- active end\n");
+    $query = "select count(distinct entity_id) from civicrm_value_participation_6 where $activeEndWhere entity_id IN (SELECT {$this->_aliases['civicrm_contact_indiv']}.id {$sqlBase})";
+//     dsm($query, "-- active end\n");
     $statistics['counts']['participation_active_end'] = array(
       'title' => ts("{$titlePrefix}Participation active at end of analysis period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
