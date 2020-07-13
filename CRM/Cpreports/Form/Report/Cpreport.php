@@ -387,11 +387,20 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       $customFieldTableName = $customField_disposition['api.CustomGroup.get']['values'][0]['table_name'];
       $customFieldColumnName = $customField_disposition['column_name'];
 
+      // Prepare to limit disposition counts to only clients whose participation ended during the given period
+      // i.e., use the same where clause as in _addStatisticParticipationEndedDuring().
+      if ($this->_participationDateTo) {
+        $endedDuringWhere = "{$this->_aliases[$customFieldTableName]}.disposition_date_46 < {$this->_participationDateTo}";
+      }
+      else {
+        $endedDuringWhere = "{$this->_aliases[$customFieldTableName]}.disposition_date_46 IS NOT NULL";
+      }
+
       // Get all the options for this custom field, so we can list them out.
       $dispositionOptions = CRM_Contact_BAO_Contact::buildOptions('custom_' . $customFieldId_disposition);
       // Cycle through all options, one stat for each.
       foreach ($dispositionOptions as $optionValue => $optionLabel) {
-        $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) $sqlBase AND {$this->_aliases[$customFieldTableName]}.{$customFieldColumnName} = %1";
+        $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) $sqlBase AND $endedDuringWhere AND {$this->_aliases[$customFieldTableName]}.{$customFieldColumnName} = %1";
         $queryParams = [
           1 => [$optionValue, 'String']
         ];
