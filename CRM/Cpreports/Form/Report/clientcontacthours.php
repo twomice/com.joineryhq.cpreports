@@ -454,7 +454,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
 
     // Get an abbreviated form of the report SQL, and use it to get a count of
     // distinct team contact_ids
-    $sqlBase = " {$this->_from} {$this->_where}";
+    $sqlBase = $this->_getSqlBase();
 
     $distinctClientCountQuery = "select count(distinct activity_contact_civireport_target.contact_id) $sqlBase";
     $statistics['counts']['distict_client_count'] = array(
@@ -473,4 +473,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     return $statistics;
   }
 
+  public function _getSqlBase() {
+    return " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
+  }
 }

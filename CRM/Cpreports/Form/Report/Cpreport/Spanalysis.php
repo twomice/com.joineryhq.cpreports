@@ -243,15 +243,13 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
 
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
-    // Get an abbreviated form of the report SQL, and use it to get a count of
-    // distinct team contact_ids
-    $sqlBase = " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
 
-    $this->_addStatisticServiceActiveStart($statistics, $sqlBase);
-    $this->_addStatisticServiceActiveEnd($statistics, $sqlBase);
-    $this->_addStatisticServiceStartedDuring($statistics, $sqlBase);
-    $this->_addStatisticServiceEndedDuring($statistics, $sqlBase);
+    $this->_addStatisticServiceActiveStart($statistics);
+    $this->_addStatisticServiceActiveEnd($statistics);
+    $this->_addStatisticServiceStartedDuring($statistics);
+    $this->_addStatisticServiceEndedDuring($statistics);
 
+    $sqlBase = $this->_getSqlBase();
 
     //Net change in active Service Providers
     $statistics['counts']['net_change'] = array(

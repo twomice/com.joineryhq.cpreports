@@ -158,7 +158,7 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     // Get an abbreviated form of the report SQL, and use it as the base for stats queries.
-    $sqlBase = " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
+    $sqlBase = $this->_getSqlBase();
 
     // Get all available 'team status' option values; we'll make a statistic for each one.
     $statusValuesQuery = "
@@ -208,4 +208,7 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
     return $statistics;
   }
 
+  public function _getSqlBase() {
+    return " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
+  }
 }

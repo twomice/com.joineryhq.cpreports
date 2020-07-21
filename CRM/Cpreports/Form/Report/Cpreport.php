@@ -110,7 +110,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "active at start of date range" to $statistics.
    */
-  function _addStatisticParticipationActiveStart(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticParticipationActiveStart(&$statistics, $titlePrefix = '') {
+    $sqlBase = $this->_getSqlBase();
     //Participation active at start of analysis period
     if (empty($this->_aliases['civicrm_contact_indiv'])) {
       return;
@@ -137,7 +138,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "ended during date range" to $statistics.
    */
-  function _addStatisticParticipationEndedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticParticipationEndedDuring(&$statistics, $titlePrefix = '') {
+    $sqlBase = $this->_getSqlBase();
     //Participation ended during analysis period
     if (empty($this->_aliases['civicrm_contact_indiv'])) {
       return;
@@ -167,7 +169,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "started during date range" to $statistics.
    */
-  function _addStatisticParticipationStartedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticParticipationStartedDuring(&$statistics, $titlePrefix = '') {
+    $sqlBase = $this->_getSqlBase();
     //Participation started during analysis period
     if (empty($this->_aliases['civicrm_contact_indiv'])) {
       return;
@@ -196,7 +199,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "active through end of date range" to $statistics.
    */
-  function _addStatisticParticipationActiveEnd(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticParticipationActiveEnd(&$statistics, $titlePrefix = '') {
+    $sqlBase = $this->_getSqlBase();
     //Participation active through end of analysis period
     if (empty($this->_aliases['civicrm_contact_indiv'])) {
       return;
@@ -221,7 +225,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "active at start of date range" to $statistics.
    */
-  function _addStatisticServiceActiveStart(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticServiceActiveStart(&$statistics, $titlePrefix = '') {
+    $sqlBase = $this->_getSqlBase();
     //Relationships active at start of analysis period
     if (empty($this->_aliases['civicrm_relationship'])) {
       return;
@@ -248,7 +253,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "ended during date range" to $statistics.
    */
-  function _addStatisticServiceEndedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticServiceEndedDuring(&$statistics, $titlePrefix = '') {
+    $sqlBase = $this->_getSqlBase();
     //Relationships ended during analysis period
     if (empty($this->_aliases['civicrm_relationship'])) {
       return;
@@ -282,7 +288,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "started during date range" to $statistics.
    */
-  function _addStatisticServiceStartedDuring(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticServiceStartedDuring(&$statistics, $titlePrefix = '') {
+    $sqlBase = $this->_getSqlBase();
     //Relationships started during analysis period
     if (empty($this->_aliases['civicrm_relationship'])) {
       return;
@@ -315,7 +322,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add a row for "active through end of date range" to $statistics.
    */
-  function _addStatisticServiceActiveEnd(&$statistics, $sqlBase, $titlePrefix = '') {
+  function _addStatisticServiceActiveEnd(&$statistics, $titlePrefix = '') {
+    $sqlBase = $this->_getSqlBase();
     //Relationships active through end of analysis period
     if (empty($this->_aliases['civicrm_relationship'])) {
       return;
@@ -340,10 +348,11 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   /**
    * Add many demographic-related stats to $statistics.
    */
-  function _addDemographicStats(&$statistics, $sqlBase) {
+  function _addDemographicStats(&$statistics) {
+    $sqlBase = $this->_getSqlBase();
 
     // Total distinct client contacts.
-    $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) {$sqlBase}";
+    $query = "SELECT COUNT(DISTINCT t.id) from (SELECT contact_indiv_civireport.id {$sqlBase}) t";
     $statistics['counts']['total_clients'] = array(
       'title' => ts("Total distinct clients"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
@@ -359,10 +368,10 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       'value' => '',
       'type' => CRM_Utils_Type::T_STRING // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
     );
-    $this->_addStatisticParticipationActiveStart($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticParticipationEndedDuring($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticParticipationStartedDuring($statistics, $sqlBase, $indentPrefix);
-    $this->_addStatisticParticipationActiveEnd($statistics, $sqlBase, $indentPrefix);
+    $this->_addStatisticParticipationActiveStart($statistics, $indentPrefix);
+    $this->_addStatisticParticipationEndedDuring($statistics, $indentPrefix);
+    $this->_addStatisticParticipationStartedDuring($statistics, $indentPrefix);
+    $this->_addStatisticParticipationActiveEnd($statistics, $indentPrefix);
 
     // Show disposition stats only if 'disposition' field is displayed
     // (Because then we can be sure the correct custom_value table is joined
@@ -619,4 +628,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     }
   }
 
+  public function _getSqlBase() {
+    return " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
+  }
 }

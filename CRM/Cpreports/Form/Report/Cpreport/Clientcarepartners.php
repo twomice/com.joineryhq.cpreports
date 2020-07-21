@@ -452,13 +452,9 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    // Get an abbreviated form of the report SQL, and use it to get a count of
-    // distinct team contact_ids
-    $sqlBase = " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
-
     $indentPrefix = '&nbsp; &nbsp; ';
 
-    $this->_addDemographicStats($statistics, $sqlBase);
+    $this->_addDemographicStats($statistics);
 
     if ($this->isTableSelected($this->_tempTableName)) {
       // Distinct carepartners count
