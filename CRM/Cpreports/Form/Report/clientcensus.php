@@ -5,15 +5,14 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
 
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
 
-  protected $_customGroupExtends = array('Individual','Contact','Relationship');
+  protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
 
   protected $customGroup_clientParticipation = array();
   protected $customField_dispositionDate = array();
 
   protected $_customGroupGroupBy = FALSE;
 
-
-  function __construct() {
+  public function __construct() {
     // Get metadata for Team_details custom field group, and for 'Team status'
     // custom field in that group.
     $this->customGroup_clientParticipation = civicrm_api3('customGroup', 'getSingle', array(
@@ -112,20 +111,20 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
           'organization_name' => array(
             'title' => E::ts('Team Name'),
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_like' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_team_civireport.nick_name',
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_select' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_team_civireport.nick_name',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $nickNameOptions,
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'order_bys' => array(
@@ -154,23 +153,23 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-//      'custom_client_participation' => array(
-//        'alias' => $this->customGroup_clientParticipation['table_name'],
-//        'fields' => array(
-//          $customField_dispositionDate['column_name'] => array(
-//            'title' => E::ts('Team status'),
-//          ),
-//        ),
-//        'filters' => array(
-//          $customField_dispositionDate['column_name'] => array(
-//            'title' => E::ts('Team status'),
-//            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-//            'options' => CRM_Core_BAO_OptionValue::getOptionValuesAssocArray($customField_dispositionDate['option_group_id']),
-//            'type' => CRM_Utils_Type::T_STRING,
-//          ),
-//        ),
-//        'grouping' => 'team-fields',
-//      ),
+    //      'custom_client_participation' => array(
+    //        'alias' => $this->customGroup_clientParticipation['table_name'],
+    //        'fields' => array(
+    //          $customField_dispositionDate['column_name'] => array(
+    //            'title' => E::ts('Team status'),
+    //          ),
+    //        ),
+    //        'filters' => array(
+    //          $customField_dispositionDate['column_name'] => array(
+    //            'title' => E::ts('Team status'),
+    //            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+    //            'options' => CRM_Core_BAO_OptionValue::getOptionValuesAssocArray($customField_dispositionDate['option_group_id']),
+    //            'type' => CRM_Utils_Type::T_STRING,
+    //          ),
+    //        ),
+    //        'grouping' => 'team-fields',
+    //      ),
       'civicrm_relationship' => array(
         'fields' => array(
           'start_date' => array(
@@ -220,9 +219,9 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
 
   }
 
-  function from() {
+  public function from() {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
-    
+
     $this->_from = "
       FROM  civicrm_contact {$this->_aliases['civicrm_contact_indiv']} {$this->_aclFrom}
         INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
@@ -264,27 +263,27 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     if ($this->isTableSelected('civicrm_phone')) {
       $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact_indiv']}.id";
     }
   }
 
-  function storeWhereHavingClauseArray() {
+  public function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
 
     // Insist that client disposition date is null
     $this->_whereClauses[] = "( custom_client_participation.{$this->customField_dispositionDate['column_name']} IS NULL )";
   }
 
-  function beginPostProcess() {
+  public function beginPostProcess() {
     parent::beginPostProcess();
 
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact_indiv']);
   }
 
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -352,7 +351,8 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
     $statistics['counts']['individuals'] = array(
       'title' => ts("Total Client(s)"),
       'value' => $indivCount,
-      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, defaul.t seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, defaul.t seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
     return $statistics;
   }

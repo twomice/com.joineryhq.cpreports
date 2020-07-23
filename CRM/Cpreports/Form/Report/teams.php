@@ -4,14 +4,13 @@ use CRM_Cpreports_ExtensionUtil as E;
 class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
 
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
-  protected $_customGroupExtends = array('Organization','Contact');
+  protected $_customGroupExtends = array('Organization', 'Contact');
   protected $_customGroupGroupBy = FALSE;
 
   protected $customGroup_teamDetails;
   protected $customFields_teamDetails = [];
 
-
-  function __construct() {
+  public function __construct() {
     // Get metadata for Team_details custom field group, and for 'Team status'
     // custom field in that group.
     $this->customGroup_teamDetails = civicrm_api3('customGroup', 'getSingle', array(
@@ -57,20 +56,20 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
           'organization_name' => array(
             'title' => E::ts('Team Name'),
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_like' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_civireport.nick_name',
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_select' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_civireport.nick_name',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $nickNameOptions,
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'order_bys' => array(
@@ -102,7 +101,7 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
     }
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
       FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
     ";
@@ -111,6 +110,7 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
 
     ";
   }
+
   public function where() {
     parent::where();
     $this->_where .= "
@@ -119,7 +119,7 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
     ";
   }
 
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -198,11 +198,12 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
       $statusStats[$statusCountsDao->statusValue]['count'] = $statusCountsDao->cnt;
     }
 
-    foreach($statusStats as $statusKey => $statusStat) {
+    foreach ($statusStats as $statusKey => $statusStat) {
       $statistics['counts']['status_' . $statusKey] = array(
         'title' => ts("Team status is '%1'", array(1 => $statusStat['label'])),
         'value' => $statusStat['count'],
-        'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_INT,
       );
     }
     return $statistics;
@@ -211,4 +212,5 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
   public function _getSqlBase() {
     return " {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
   }
+
 }

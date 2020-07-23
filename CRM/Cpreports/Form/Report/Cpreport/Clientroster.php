@@ -8,7 +8,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
   protected $_customGroupGroupBy = FALSE;
   protected $_customFields = array();
 
-  function __construct() {
+  public function __construct() {
     // Build a list of options for the nick_name select filter (all existing team nicknames)
     $nickNameOptions = array();
     $dao = CRM_Core_DAO::executeQuery(
@@ -187,7 +187,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
 
   }
 
-  function from() {
+  public function from() {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
 
     $this->_from = "
@@ -225,14 +225,13 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
     ";
   }
 
-  function groupBy() {
+  public function groupBy() {
     if ($this->isTableSelected('civicrm_contact_team')) {
       $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact_indiv']}.id";
     }
   }
 
-
-  function storeWhereHavingClauseArray() {
+  public function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
 
     // Ensure we only return individuals
@@ -266,7 +265,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
     }
   }
 
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {

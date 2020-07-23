@@ -12,7 +12,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
   protected $_relationshipTypeLabelOptions = array();
   protected $_tempTableName = 'TEMP_ClientCarepartners';
 
-  function __construct() {
+  public function __construct() {
     // Build a list of options for the nick_name select filter (all existing team nicknames)
     $nickNameOptions = array();
     $dao = CRM_Core_DAO::executeQuery('
@@ -160,7 +160,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     ];
   }
 
-  function from() {
+  public function from() {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
 
     $this->_from = "
@@ -190,7 +190,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     ";
   }
 
-  function _addParticipationDatesFrom($contactTableName) {
+  public function _addParticipationDatesFrom($contactTableName) {
     parent::_addParticipationDatesFrom($contactTableName);
     if ($this->isTableSelected('alias_civicrm_value_participation_6')) {
       $this->_from .= "
@@ -200,7 +200,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       ";
     }
   }
-
 
   /**
    * Build order by clause, appending "_tempTableName.carepartner_sort_name"
@@ -219,7 +218,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     }
   }
 
-  function storeWhereHavingClauseArray() {
+  public function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
     if ($this->_params['diagnosis_value']) {
       // Apply "any diagnosis" filter
@@ -351,7 +350,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     return $buildQuerySql;
   }
 
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -462,14 +461,16 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       $statistics['counts']['total_carepartners'] = array(
         'title' => E::ts('Total distinct CarePartners'),
         'value' => CRM_Core_DAO::singleValueQuery($query),
-        'type' => CRM_Utils_Type::T_INT // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_INT,
       );
 
       // Section header
       $statistics['counts']['relationship_types_blank'] = array(
         'title' => E::ts('CarePartner relationship types'),
         'value' => '',
-        'type' => CRM_Utils_Type::T_STRING // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_STRING,
       );
 
       // CarePartner relationship
@@ -488,7 +489,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
         $statistics['counts']['relationship_types_' . $dao->relationship_type_id] = array(
           'title' => $indentPrefix . ts($dao->label),
           'value' => $dao->cnt,
-          'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+          // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+          'type' => CRM_Utils_Type::T_INT,
         );
       }
     }
@@ -497,7 +499,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       $statistics['counts']['relationship_types_blank'] = array(
         'title' => E::ts('CarePartner relationship types'),
         'value' => E::ts('Please enable the "CarePartner Relationships" column to reveal these statistics.'),
-        'type' => CRM_Utils_Type::T_STRING // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_STRING,
       );
     }
 
@@ -507,7 +510,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       $statistics['counts']['carepartner_diagnosis_blank'] = array(
         'title' => E::ts('CarePartner diagnosis'),
         'value' => '',
-        'type' => CRM_Utils_Type::T_STRING // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_STRING,
       );
       $query = "
         SELECT COUNT(DISTINCT t.carepartner_contact_id)
@@ -528,7 +532,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
         $statistics['counts']['carepartner_diagnosis-' . $optionValue] = array(
           'title' => $indentPrefix . $optionLabel,
           'value' => CRM_Core_DAO::singleValueQuery($query, $queryParams),
-          'type' => CRM_Utils_Type::T_INT // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+          // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+          'type' => CRM_Utils_Type::T_INT,
         );
       }
     }
@@ -537,7 +542,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       $statistics['counts']['carepartner_diagnosis_blank'] = array(
         'title' => E::ts('CarePartner diagnosis'),
         'value' => E::ts('Please enable the "CarePartner Diagnosis" column to reveal these statistics.'),
-        'type' => CRM_Utils_Type::T_STRING // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_STRING,
       );
     }
 
