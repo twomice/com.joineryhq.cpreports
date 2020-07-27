@@ -1,7 +1,7 @@
 <?php
 
 require_once 'cpreports.civix.php';
-// use CRM_Cpreports_ExtensionUtil as E;
+use CRM_Cpreports_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
