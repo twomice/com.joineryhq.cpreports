@@ -526,7 +526,20 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
         // Cycle through all options, one stat for each.
         foreach ($raceOptions as $raceOptionValue => $raceOptionLabel) {
           foreach ($genderOptions as $genderOptionValue => $genderOptionLabel) {
-            $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) $sqlBase AND {$this->_aliases[$raceCustomFieldTableName]}.{$raceCustomFieldColumnName} = %1 AND {$this->_aliases['civicrm_contact_indiv']}.gender_id = %2";
+            $query = "
+              SELECT COUNT(DISTINCT t.contact_id)
+              FROM
+              (
+                SELECT
+                  {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+                $sqlBase
+              ) t
+              INNER JOIN civicrm_contact c ON c.id = t.contact_id
+              INNER JOIN $raceCustomFieldTableName customtable ON customtable.entity_id = t.contact_id
+              WHERE
+                customtable.{$raceCustomFieldColumnName} = %1
+                AND c.gender_id = %2
+            ";
             $queryParams = [
               1 => [$raceOptionLabel, 'String'],
               2 => [$genderOptionValue, 'Int']
@@ -549,11 +562,19 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
         foreach ($genderOptions as $genderOptionValue => $genderOptionLabel) {
           $queryParams[1] = [$genderOptionValue, 'Int'];
           $query = "
-            SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id)
-            $sqlBase
-            AND {$this->_aliases['civicrm_contact_indiv']}.gender_id = %1
-            AND {$this->_aliases[$raceCustomFieldTableName]}.{$raceCustomFieldColumnName} > ''
-            AND {$this->_aliases[$raceCustomFieldTableName]}.{$raceCustomFieldColumnName} NOT IN (" . implode($raceSqlPlaceholders, ',') . ")
+            SELECT COUNT(DISTINCT t.contact_id)
+            FROM
+            (
+              SELECT
+                {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+              $sqlBase
+            ) t
+            INNER JOIN civicrm_contact c ON c.id = t.contact_id
+            INNER JOIN $raceCustomFieldTableName customtable ON customtable.entity_id = t.contact_id
+            WHERE
+              c.gender_id = %1
+              AND customtable.{$raceCustomFieldColumnName} > ''
+              AND customtable.{$raceCustomFieldColumnName} NOT IN (" . implode($raceSqlPlaceholders, ',') . ")
           ";
           $statistics['counts']["sex-race_other-{$genderOptionValue}"] = array(
             'title' => ts("{$indentPrefix}Other, {$genderOptionLabel}"),
