@@ -655,13 +655,20 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       'type' => CRM_Utils_Type::T_STRING // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
     );
     $query = "
-      SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id)
-      $sqlBase
-      AND %1 IN (
-        civicrm_value_health_5.{$this->_customFields['diagnosis1']['column_name']},
-        civicrm_value_health_5.{$this->_customFields['diagnosis2']['column_name']},
-        civicrm_value_health_5.{$this->_customFields['diagnosis3']['column_name']}
-      )
+      SELECT COUNT(DISTINCT t.contact_id)
+      FROM
+      (
+        SELECT
+          {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+        $sqlBase
+      ) t
+      INNER JOIN civicrm_value_health_5 customtable ON customtable.entity_id = t.contact_id
+      WHERE
+        %1 IN (
+          customtable.{$this->_customFields['diagnosis1']['column_name']},
+          customtable.{$this->_customFields['diagnosis2']['column_name']},
+          customtable.{$this->_customFields['diagnosis3']['column_name']}
+        )
     ";
     // Get all the options for this custom field, so we can list them out.
     $diagnosisOptions = CRM_Contact_BAO_Contact::buildOptions('custom_' . $this->_customFields['diagnosis1']['id']);
