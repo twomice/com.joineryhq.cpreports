@@ -177,7 +177,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     }
     //Participation started during analysis period
     if ($this->_participationDateFrom) {
-      $startedDuringWhere = "service_began_3 > {$this->_participationDateTo}";
+      $startedDuringWhere = "service_began_3 >= {$this->_participationDateFrom}";
     }
     else {
       $startedDuringWhere = "service_began_3 IS NOT NULL";
