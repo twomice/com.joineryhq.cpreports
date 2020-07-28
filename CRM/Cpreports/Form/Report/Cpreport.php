@@ -461,7 +461,18 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     $genderOptions = CRM_Contact_BAO_Contact::buildOptions('gender_id');
     // Cycle through all options, one stat for each.
     foreach ($genderOptions as $optionValue => $optionLabel) {
-      $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) $sqlBase AND {$this->_aliases['civicrm_contact_indiv']}.gender_id = %1";
+      $query = "
+        SELECT COUNT(DISTINCT t.contact_id)
+        FROM
+        (
+          SELECT
+            {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+          $sqlBase
+        ) t
+        INNER JOIN civicrm_contact c ON c.id = t.contact_id
+        WHERE
+          c.gender_id = %1
+      ";
       $queryParams = [
         1 => [$optionValue, 'String']
       ];
