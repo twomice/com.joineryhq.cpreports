@@ -619,18 +619,25 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
         1 => [$min, 'Int'],
       ];
       if (!isset($max)) {
-        $ageWhere = " AND $ageSql > %1 ";
+        $ageWhere = " $ageSql >= %1 ";
         $statLabel = "$min and over";
       }
       else {
-        $ageWhere = " AND $ageSql BETWEEN %1 AND %2";
+        $ageWhere = " $ageSql BETWEEN %1 AND %2";
         $queryParams[2] = [$max, 'Int'];
         $statLabel = "$min - $max";
       }
-
       $query = "
-        SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) {$sqlBase}
-        $ageWhere
+        SELECT COUNT(DISTINCT t.contact_id)
+        FROM
+        (
+          SELECT
+            {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+          $sqlBase
+        ) t
+        INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact_indiv']} ON {$this->_aliases['civicrm_contact_indiv']}.id = t.contact_id
+        WHERE
+          $ageWhere
       ";
       $statistics['counts']['age-' . $min] = array(
         'title' => $indentPrefix . $statLabel,
