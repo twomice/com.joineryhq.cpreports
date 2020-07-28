@@ -409,7 +409,18 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       $dispositionOptions = CRM_Contact_BAO_Contact::buildOptions('custom_' . $customFieldId_disposition);
       // Cycle through all options, one stat for each.
       foreach ($dispositionOptions as $optionValue => $optionLabel) {
-        $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) $sqlBase AND $endedDuringWhere AND {$this->_aliases[$customFieldTableName]}.{$customFieldColumnName} = %1";
+        $query = "
+          SELECT COUNT(DISTINCT t.contact_id)
+          FROM
+          (
+            SELECT
+              {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+            $sqlBase
+          ) t
+          INNER JOIN $customFieldTableName {$this->_aliases[$customFieldTableName]} ON {$this->_aliases[$customFieldTableName]}.entity_id = t.contact_id
+          WHERE $endedDuringWhere
+            AND {$this->_aliases[$customFieldTableName]}.{$customFieldColumnName} = %1
+        ";
         $queryParams = [
           1 => [$optionValue, 'String']
         ];
