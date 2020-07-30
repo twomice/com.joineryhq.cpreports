@@ -457,9 +457,9 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     $sqlBase = $this->_getSqlBase();
 
     $distinctClientCountQuery = "
-      select count(distinct t.contact_id)
+      select count(distinct t.id)
       from (
-        select activity_contact_civireport_target.contact_id $sqlBase
+        select civicrm_contact_assignee_civireport.id $sqlBase
       ) t
     ";
     $statistics['counts']['distict_client_count'] = array(
