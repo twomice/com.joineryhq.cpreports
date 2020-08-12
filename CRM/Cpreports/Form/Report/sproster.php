@@ -4,15 +4,14 @@ use CRM_Cpreports_ExtensionUtil as E;
 class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
 
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
-  
-  protected $_customGroupExtends = array('Individual','Contact','Relationship');
+
+  protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
 
   protected $customGroup_teamDetails = array();
 
   protected $_customGroupGroupBy = FALSE;
 
-
-  function __construct() {
+  public function __construct() {
     // Get metadata for Team_details custom field group, and for 'Team status'
     // custom field in that group.
     $this->customGroup_teamDetails = civicrm_api3('customGroup', 'getSingle', array(
@@ -111,20 +110,20 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
           'organization_name' => array(
             'title' => E::ts('Team Name'),
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_like' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_team_civireport.nick_name',
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_select' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'contact_team_civireport.nick_name',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $nickNameOptions,
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'order_bys' => array(
@@ -198,10 +197,10 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function from() {
+  public function from() {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
     $this->_aliases['civicrm_relationship'] = 'r';
-    
+
     $this->_from = "
       FROM  civicrm_contact {$this->_aliases['civicrm_contact_indiv']} {$this->_aclFrom}
         INNER JOIN civicrm_relationship r 
@@ -245,11 +244,11 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact_indiv']}.id, r.id";
   }
 
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -317,7 +316,8 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
     $statistics['counts']['teams'] = array(
       'title' => ts("Total Team(s)"),
       'value' => $teamCount,
-      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, defaul.t seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, defaul.t seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
     return $statistics;
   }

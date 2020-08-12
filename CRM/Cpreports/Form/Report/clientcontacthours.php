@@ -9,8 +9,9 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 use CRM_Cpreports_ExtensionUtil as E;
+
 class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
-  
+
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
 
   protected $_selectAliasesTotal = array();
@@ -60,12 +61,12 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     while ($dao->fetch()) {
       $nickNameOptions[$dao->nick_name] = $dao->nick_name;
     }
-    
+
     // Build a list of options for the diagnosis select filter (all diagnosis options)
     $customFieldId_diagnosis1 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_1', 'Health');
     $customFieldId_diagnosis2 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_2', 'Health');
     $customFieldId_diagnosis3 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_3', 'Health');
-    $diagnosisOptions = CRM_Core_BAO_CustomField::buildOptions('custom_'. $customFieldId_diagnosis1);
+    $diagnosisOptions = CRM_Core_BAO_CustomField::buildOptions('custom_' . $customFieldId_diagnosis1);
 
     $this->_customFields['diagnosis1'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis1));
     $this->_customFields['diagnosis2'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis2));
@@ -102,7 +103,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
             'pseudofield' => TRUE,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $diagnosisOptions,
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
             'dbAlias' => "ARTIFICIALLY MANUFACTURED IN self::storeWhereHavingClauseArray()",
           ),
         ),
@@ -142,14 +143,14 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'civicrm_contact_target_civireport.nick_name',
             'operator' => 'like',
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'nick_name_select' => array(
             'title' => E::ts('Team Nickname'),
             'dbAlias' => 'civicrm_contact_target_civireport.nick_name',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $nickNameOptions,
-            'type' =>	CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'grouping' => 'contact-fields',
@@ -284,7 +285,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       else {
         $andOr = ' AND ';
       }
-      $this->_whereClauses[] = '('. implode($andOr, $diagnosisOrWheres) . ')';
+      $this->_whereClauses[] = '(' . implode($andOr, $diagnosisOrWheres) . ')';
     }
 
   }
@@ -295,7 +296,6 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
   public function groupBy() {
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_activity']}.id");
   }
-
 
   public function sectionTotals() {
     // Get $select here, because parent::sectionTotals() alters $this->_select
@@ -331,7 +331,6 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       $this->assign('sectionTotals', $totals);
     }
   }
-
 
   /**
    * Build ACL clause.
@@ -465,7 +464,8 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     $statistics['counts']['distict_client_count'] = array(
       'title' => ts("Total distinct clients"),
       'value' => CRM_Core_DAO::singleValueQuery($distinctClientCountQuery),
-      'type' => CRM_Utils_Type::T_INT, // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
 
     $totalMinutesQuery = "
@@ -478,7 +478,8 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     $statistics['counts']['total_duration'] = array(
       'title' => ts("Total duration"),
       'value' => CRM_Core_DAO::singleValueQuery($totalMinutesQuery),
-      'type' => CRM_Utils_Type::T_INT, // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
 
     return $statistics;

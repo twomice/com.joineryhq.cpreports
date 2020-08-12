@@ -140,24 +140,24 @@ function cpreports_civicrm_entityTypes(&$entityTypes) {
  * Implements hook_civicrm_preProcess().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function cpreports_civicrm_preProcess($formName, &$form) {
+ */
+// function cpreports_civicrm_preProcess($formName, &$form) {
 
-} // */
+// } // */
 
 /**
  * Implements hook_civicrm_navigationMenu().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
-function cpreports_civicrm_navigationMenu(&$menu) {
-  _cpreports_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _cpreports_civix_navigationMenu($menu);
-} // */
+ */
+// function cpreports_civicrm_navigationMenu(&$menu) {
+//   _cpreports_civix_insert_navigation_menu($menu, 'Mailings', array(
+//     'label' => E::ts('New subliminal message'),
+//     'name' => 'mailing_subliminal_message',
+//     'url' => 'civicrm/mailing/subliminal',
+//     'permission' => 'access CiviMail',
+//     'operator' => 'OR',
+//     'separator' => 0,
+//   ));
+//   _cpreports_civix_navigationMenu($menu);
+// } // */
