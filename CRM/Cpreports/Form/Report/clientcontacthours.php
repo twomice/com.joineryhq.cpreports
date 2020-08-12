@@ -455,7 +455,12 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     // distinct team contact_ids
     $sqlBase = $this->_getSqlBase();
 
-    $distinctClientCountQuery = "select count(distinct activity_contact_civireport_target.contact_id) $sqlBase";
+    $distinctClientCountQuery = "
+      select count(distinct t.contact_id)
+      from (
+        select activity_contact_civireport_target.contact_id $sqlBase
+      ) t
+    ";
     $statistics['counts']['distict_client_count'] = array(
       'title' => ts("Total distinct clients"),
       'value' => CRM_Core_DAO::singleValueQuery($distinctClientCountQuery),
@@ -463,7 +468,13 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       'type' => CRM_Utils_Type::T_INT,
     );
 
-    $totalMinutesQuery = "select sum(activity_civireport.duration) $sqlBase";
+    $totalMinutesQuery = "
+      select sum(t.duration)
+      from (
+        select activity_civireport.duration $sqlBase
+      ) t
+    ";
+
     $statistics['counts']['total_duration'] = array(
       'title' => ts("Total duration"),
       'value' => CRM_Core_DAO::singleValueQuery($totalMinutesQuery),

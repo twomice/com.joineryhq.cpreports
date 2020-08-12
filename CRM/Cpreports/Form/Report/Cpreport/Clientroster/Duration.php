@@ -21,6 +21,35 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster_Duration extends CRM_Cprep
     if ($from) {
       $this->_serviceDateFrom = $from;
     }
+    $this->_addStatisticParticipationEndedDuring($statistics);
+
+    $sqlBase = $this->_getSqlBase();
+
+    //Total composite duration of all clients (days)
+    $query = "
+      select sum({$this->_columns['alias_civicrm_value_participation_6']['fields']['days_participated']['dbAlias']})
+      from (
+      select contact_indiv_civireport.id as contact_id
+      -- sqlbase >>>>
+      {$sqlBase}
+      -- <<< sqlbase
+    ) t
+    inner join civicrm_value_participation_6 alias_civicrm_value_participation_6_civireport ON alias_civicrm_value_participation_6_civireport.entity_id = t.contact_id
+    ";
+    $statistics['counts']['total_days'] = array(
+      'title' => ts("Total of all client duration (days)"),
+      'value' => CRM_Core_DAO::singleValueQuery($query),
+      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+
+    //Average duration (based on all Service Providers processed
+    $avgValue = ($statistics['counts']['participation_ended_during']['value'] ? ($statistics['counts']['total_days']['value'] / $statistics['counts']['participation_ended_during']['value']) : 'N/A');
+    $statistics['counts']['average_duration'] = array(
+      'title' => ts("Average client duration (days)"),
+      'value' => $avgValue,
+      'type' => (is_numeric($avgValue) ? CRM_Utils_Type::T_INT : CRM_Utils_Type::T_STRING), // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+    );
+
     return $statistics;
   }
 

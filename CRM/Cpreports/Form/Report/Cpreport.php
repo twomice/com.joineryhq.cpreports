@@ -179,7 +179,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     }
     //Participation started during analysis period
     if ($this->_participationDateFrom) {
-      $startedDuringWhere = "service_began_3 > {$this->_participationDateTo}";
+      $startedDuringWhere = "service_began_3 >= {$this->_participationDateFrom}";
     }
     else {
       $startedDuringWhere = "service_began_3 IS NOT NULL";
@@ -420,7 +420,18 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       $dispositionOptions = CRM_Contact_BAO_Contact::buildOptions('custom_' . $customFieldId_disposition);
       // Cycle through all options, one stat for each.
       foreach ($dispositionOptions as $optionValue => $optionLabel) {
-        $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) $sqlBase AND $endedDuringWhere AND {$this->_aliases[$customFieldTableName]}.{$customFieldColumnName} = %1";
+        $query = "
+          SELECT COUNT(DISTINCT t.contact_id)
+          FROM
+          (
+            SELECT
+              {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+            $sqlBase
+          ) t
+          INNER JOIN $customFieldTableName {$this->_aliases[$customFieldTableName]} ON {$this->_aliases[$customFieldTableName]}.entity_id = t.contact_id
+          WHERE $endedDuringWhere
+            AND {$this->_aliases[$customFieldTableName]}.{$customFieldColumnName} = %1
+        ";
         $queryParams = [
           1 => [$optionValue, 'String'],
         ];
@@ -465,7 +476,18 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     $genderOptions = CRM_Contact_BAO_Contact::buildOptions('gender_id');
     // Cycle through all options, one stat for each.
     foreach ($genderOptions as $optionValue => $optionLabel) {
-      $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) $sqlBase AND {$this->_aliases['civicrm_contact_indiv']}.gender_id = %1";
+      $query = "
+        SELECT COUNT(DISTINCT t.contact_id)
+        FROM
+        (
+          SELECT
+            {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+          $sqlBase
+        ) t
+        INNER JOIN civicrm_contact c ON c.id = t.contact_id
+        WHERE
+          c.gender_id = %1
+      ";
       $queryParams = [
         1 => [$optionValue, 'String'],
       ];
@@ -522,7 +544,20 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
         // Cycle through all options, one stat for each.
         foreach ($raceOptions as $raceOptionValue => $raceOptionLabel) {
           foreach ($genderOptions as $genderOptionValue => $genderOptionLabel) {
-            $query = "SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) $sqlBase AND {$this->_aliases[$raceCustomFieldTableName]}.{$raceCustomFieldColumnName} = %1 AND {$this->_aliases['civicrm_contact_indiv']}.gender_id = %2";
+            $query = "
+              SELECT COUNT(DISTINCT t.contact_id)
+              FROM
+              (
+                SELECT
+                  {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+                $sqlBase
+              ) t
+              INNER JOIN civicrm_contact c ON c.id = t.contact_id
+              INNER JOIN $raceCustomFieldTableName customtable ON customtable.entity_id = t.contact_id
+              WHERE
+                customtable.{$raceCustomFieldColumnName} = %1
+                AND c.gender_id = %2
+            ";
             $queryParams = [
               1 => [$raceOptionLabel, 'String'],
               2 => [$genderOptionValue, 'Int'],
@@ -546,11 +581,19 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
         foreach ($genderOptions as $genderOptionValue => $genderOptionLabel) {
           $queryParams[1] = [$genderOptionValue, 'Int'];
           $query = "
-            SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id)
-            $sqlBase
-            AND {$this->_aliases['civicrm_contact_indiv']}.gender_id = %1
-            AND {$this->_aliases[$raceCustomFieldTableName]}.{$raceCustomFieldColumnName} > ''
-            AND {$this->_aliases[$raceCustomFieldTableName]}.{$raceCustomFieldColumnName} NOT IN (" . implode($raceSqlPlaceholders, ',') . ")
+            SELECT COUNT(DISTINCT t.contact_id)
+            FROM
+            (
+              SELECT
+                {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+              $sqlBase
+            ) t
+            INNER JOIN civicrm_contact c ON c.id = t.contact_id
+            INNER JOIN $raceCustomFieldTableName customtable ON customtable.entity_id = t.contact_id
+            WHERE
+              c.gender_id = %1
+              AND customtable.{$raceCustomFieldColumnName} > ''
+              AND customtable.{$raceCustomFieldColumnName} NOT IN (" . implode($raceSqlPlaceholders, ',') . ")
           ";
           $statistics['counts']["sex-race_other-{$genderOptionValue}"] = array(
             'title' => ts("{$indentPrefix}Other, {$genderOptionLabel}"),
@@ -598,18 +641,25 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
         1 => [$min, 'Int'],
       ];
       if (!isset($max)) {
-        $ageWhere = " AND $ageSql > %1 ";
+        $ageWhere = " $ageSql >= %1 ";
         $statLabel = "$min and over";
       }
       else {
-        $ageWhere = " AND $ageSql BETWEEN %1 AND %2";
+        $ageWhere = " $ageSql BETWEEN %1 AND %2";
         $queryParams[2] = [$max, 'Int'];
         $statLabel = "$min - $max";
       }
-
       $query = "
-        SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id) {$sqlBase}
-        $ageWhere
+        SELECT COUNT(DISTINCT t.contact_id)
+        FROM
+        (
+          SELECT
+            {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+          $sqlBase
+        ) t
+        INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact_indiv']} ON {$this->_aliases['civicrm_contact_indiv']}.id = t.contact_id
+        WHERE
+          $ageWhere
       ";
       $statistics['counts']['age-' . $min] = array(
         'title' => $indentPrefix . $statLabel,
@@ -629,13 +679,20 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       'type' => CRM_Utils_Type::T_STRING,
     );
     $query = "
-      SELECT COUNT(DISTINCT {$this->_aliases['civicrm_contact_indiv']}.id)
-      $sqlBase
-      AND %1 IN (
-        civicrm_value_health_5.{$this->_customFields['diagnosis1']['column_name']},
-        civicrm_value_health_5.{$this->_customFields['diagnosis2']['column_name']},
-        civicrm_value_health_5.{$this->_customFields['diagnosis3']['column_name']}
-      )
+      SELECT COUNT(DISTINCT t.contact_id)
+      FROM
+      (
+        SELECT
+          {$this->_aliases['civicrm_contact_indiv']}.id as contact_id
+        $sqlBase
+      ) t
+      INNER JOIN civicrm_value_health_5 customtable ON customtable.entity_id = t.contact_id
+      WHERE
+        %1 IN (
+          customtable.{$this->_customFields['diagnosis1']['column_name']},
+          customtable.{$this->_customFields['diagnosis2']['column_name']},
+          customtable.{$this->_customFields['diagnosis3']['column_name']}
+        )
     ";
     // Get all the options for this custom field, so we can list them out.
     $diagnosisOptions = CRM_Contact_BAO_Contact::buildOptions('custom_' . $this->_customFields['diagnosis1']['id']);
