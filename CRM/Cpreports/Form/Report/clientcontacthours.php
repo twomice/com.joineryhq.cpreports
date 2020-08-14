@@ -78,6 +78,10 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
         'dao' => 'CRM_Contact_DAO_Contact',
         'alias' => 'civicrm_contact_assignee',
         'fields' => array(
+          'contact_assignee_id_display' => array(
+            'name' => 'id',
+            'title' => E::ts('Assignee (Client) ID'),
+          ),
           'contact_assignee' => array(
             'name' => 'sort_name',
             'title' => E::ts('Assignee (Client) Name'),
