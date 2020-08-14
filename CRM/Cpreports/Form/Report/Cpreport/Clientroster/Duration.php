@@ -1,10 +1,9 @@
 <?php
-
 use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_Cpreport_Clientroster_Duration extends CRM_Cpreports_Form_Report_Cpreport_Clientroster {
 
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 

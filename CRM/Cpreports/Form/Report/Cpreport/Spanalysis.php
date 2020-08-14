@@ -7,7 +7,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
   protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
   protected $_customGroupGroupBy = FALSE;
 
-  function __construct() {
+  public function __construct() {
     // Build a list of options for the nick_name select filter (all existing team nicknames)
     $nickNameOptions = array();
     $dao = CRM_Core_DAO::executeQuery('
@@ -155,7 +155,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     parent::__construct();
   }
 
-  function from() {
+  public function from() {
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_indiv'];
 
     $this->_from = "
@@ -183,14 +183,14 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     ";
   }
 
-  function beginPostProcess() {
+  public function beginPostProcess() {
     parent::beginPostProcess();
     foreach (array('relative', 'from', 'to') as $suffix) {
       $this->_params["end_date_" . $suffix] = $this->_params["start_date_" . $suffix] = $this->_params["service_dates_" . $suffix];
     }
   }
 
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -255,7 +255,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     $statistics['counts']['net_change'] = array(
       'title' => ts("Net change in active Service Providers"),
       'value' => ($statistics['counts']['active_end']['value'] - $statistics['counts']['active_start']['value']),
-      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
 
     //Total Service Providers processed (Active and Terminated)
@@ -263,7 +264,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     $statistics['counts']['total_processed'] = array(
       'title' => ts("Total Service Providers processed (Active and Terminated)"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
-      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
 
     //Total composite duration of all service providers (days)
@@ -271,16 +273,17 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     $statistics['counts']['total_days'] = array(
       'title' => ts("Total composite duration of all service providers (days)"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
-      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
 
     //Average duration (based on all Service Providers processed
     $statistics['counts']['average_duration'] = array(
       'title' => ts("Average duration (based on all Service Providers processed)"),
       'value' => ($statistics['counts']['total_processed']['value'] ? ($statistics['counts']['total_days']['value'] / $statistics['counts']['total_processed']['value']) : 0),
-      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
-
 
     return $statistics;
   }
