@@ -330,7 +330,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     $select = str_ireplace('SELECT SQL_CALC_FOUND_ROWS ', 'SELECT ', $this->_select);
     parent::sectionTotals();
 
-    // If we're sorting on client name, with a header and it's the first section
+    // If we're sorting on contact name, with a header and it's the first section
     // total, AND if we're displaying the duration column, we'll sum up the
     // duration of service records. Othwerwise, we won't bother.
     $sectionAliases = array_keys($this->_sections);
@@ -482,15 +482,15 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     // distinct team contact_ids
     $sqlBase = $this->_getSqlBase();
 
-    $distinctClientCountQuery = "
+    $distinctContactCountQuery = "
       select count(distinct t.id)
       from (
         select civicrm_contact_assignee_civireport.id $sqlBase
       ) t
     ";
-    $statistics['counts']['distict_client_count'] = array(
-      'title' => ts("Total distinct clients"),
-      'value' => CRM_Core_DAO::singleValueQuery($distinctClientCountQuery),
+    $statistics['counts']['distict_contact_count'] = array(
+      'title' => ts("Total distinct contacts"),
+      'value' => CRM_Core_DAO::singleValueQuery($distinctContactCountQuery),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
     );
