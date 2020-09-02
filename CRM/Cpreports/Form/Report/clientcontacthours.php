@@ -98,11 +98,11 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
         'fields' => array(
           'contact_assignee_id_display' => array(
             'name' => 'id',
-            'title' => E::ts('Assignee (Client) ID'),
+            'title' => E::ts('Assignee ID'),
           ),
           'contact_assignee' => array(
             'name' => 'sort_name',
-            'title' => E::ts('Assignee (Client) Name'),
+            'title' => E::ts('Assignee Name'),
             'dbAlias' => "civicrm_contact_assignee_civireport.sort_name",
             'default' => TRUE,
           ),
@@ -115,7 +115,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
         'filters' => array(
           'contact_assignee' => array(
             'name' => 'sort_name',
-            'title' => E::ts('Assignee (Client) Name'),
+            'title' => E::ts('Assignee Name'),
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
           ),
@@ -130,7 +130,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'sort_name' => array(
-            'title' => E::ts('Assignee (Client) Name'),
+            'title' => E::ts('Assignee Name'),
             'default_weight' => '1',
             'default_is_section' => TRUE,
           ),
