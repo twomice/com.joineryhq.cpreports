@@ -184,6 +184,9 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
             'title' => E::ts('Activity ID'),
             'required' => TRUE,
           ),
+          'activity_type_id' => array(
+            'title' => E::ts('Activity Type'),
+          ),
           'activity_subject' => array(
             'title' => E::ts('Subject'),
             'default' => TRUE,
@@ -469,6 +472,13 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
         }
       }
 
+      if (array_key_exists('civicrm_activity_activity_type_id', $row)) {
+        if ($value = $row['civicrm_activity_activity_type_id']) {
+          $rows[$rowNum]['civicrm_activity_activity_type_id'] = $this->activityTypeIdOptions[$value];
+          $entryFound = TRUE;
+        }
+      }
+
       if (!$entryFound) {
         break;
       }
@@ -482,15 +492,43 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     // distinct team contact_ids
     $sqlBase = $this->_getSqlBase();
 
-    $distinctContactCountQuery = "
+    // Section header
+    $statistics['counts']['contact_count_blank'] = array(
+      'title' => E::ts('Distinct contacts per activity type'),
+      'value' => '',
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_STRING,
+    );
+
+    $indentPrefix = '&nbsp; &nbsp; ';
+
+    foreach($this->activityTypeIdOptions as $activityTypeId => $activityTypeLabel) {
+      $activityTypeCountQuery = "
+        select count(distinct t.id)
+        from (
+          select civicrm_contact_assignee_civireport.id, activity_civireport.activity_type_id $sqlBase
+        ) t
+        where t.activity_type_id = %1
+      ";
+      $activityTypeCountParams = array(
+        '1' => array($activityTypeId, 'Int'),
+      );
+      $statistics['counts']['contact_count_'. $activityTypeId] = array(
+        'title' => $indentPrefix . $activityTypeLabel,
+        'value' => CRM_Core_DAO::singleValueQuery($activityTypeCountQuery, $activityTypeCountParams),
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_INT,
+      );
+    }
+    $activityTypeCountQuery = "
       select count(distinct t.id)
       from (
         select civicrm_contact_assignee_civireport.id $sqlBase
       ) t
     ";
-    $statistics['counts']['distict_contact_count'] = array(
-      'title' => ts("Total distinct contacts"),
-      'value' => CRM_Core_DAO::singleValueQuery($distinctContactCountQuery),
+    $statistics['counts']['contact_count_total'] = array(
+      'title' => $indentPrefix . ts('Total'),
+      'value' => CRM_Core_DAO::singleValueQuery($activityTypeCountQuery),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
     );
