@@ -24,6 +24,9 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
 
   protected $_customFields = array();
 
+  // list of options for the activity_type_id filter.
+  protected $activityTypeIdOptions = array();
+
   /**
    * This report has not been optimised for group filtering.
    *
@@ -61,6 +64,20 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     while ($dao->fetch()) {
       $nickNameOptions[$dao->nick_name] = $dao->nick_name;
     }
+
+    // Populate list of options for the activity_type_id filter
+    $activityType = civicrm_api3('optionValue', 'get', [
+      'sequential' => 1,
+      'name' => 'Service hours',
+      'option_group_id' => "activity_type",
+    ]);
+    $this->activityTypeIdOptions[$activityType['values'][0]['value']] = $activityType['values'][0]['label'];
+    $activityType = civicrm_api3('optionValue', 'get', [
+      'sequential' => 1,
+      'name' => 'Client Service Hours',
+      'option_group_id' => "activity_type",
+    ]);
+    $this->activityTypeIdOptions[$activityType['values'][0]['value']] = $activityType['values'][0]['label'];
 
     // Build a list of options for the diagnosis select filter (all diagnosis options)
     $customFieldId_diagnosis1 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_1', 'Health');
@@ -208,6 +225,12 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityStatus(),
           ),
+          'activity_type_id' => array(
+            'title' => E::ts('Activity Type'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $this->activityTypeIdOptions,
+          ),
         ),
         'order_bys' => array(
           'activity_date_time' => array(
@@ -263,7 +286,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
   public function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
     // Limit this report to 'service hours' activities (type_id = 56)
-    $this->_whereClauses[] = "{$this->_aliases['civicrm_activity']}.activity_type_id = 56";
+    $this->_whereClauses[] = "{$this->_aliases['civicrm_activity']}.activity_type_id IN (". implode(', ', array_keys($this->activityTypeIdOptions)).")";
 
     if ($this->_params['diagnosis_value']) {
       // Apply "any diagnosis" filter
