@@ -11,8 +11,8 @@ return array(
     'params' =>
     array(
       'version' => 3,
-      'label' => 'Client Contact Hours',
-      'description' => 'Client Contact Hours',
+      'label' => 'Contact Service Hours',
+      'description' => 'Contact Service Hours',
       'class_name' => 'CRM_Cpreports_Form_Report_clientcontacthours',
       'report_url' => 'cpreports/clientcontacthours',
       'component' => '',
