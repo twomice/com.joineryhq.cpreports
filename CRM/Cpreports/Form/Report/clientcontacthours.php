@@ -24,7 +24,10 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
 
   protected $_customFields = array();
 
-  // list of options for the activity_type_id filter.
+  /**
+   * @var array
+   * list of options for the activity_type_id filter.
+   */
   protected $activityTypeIdOptions = array();
 
   /**
@@ -289,7 +292,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
   public function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
     // Limit this report to 'service hours' activities (type_id = 56)
-    $this->_whereClauses[] = "{$this->_aliases['civicrm_activity']}.activity_type_id IN (". implode(', ', array_keys($this->activityTypeIdOptions)).")";
+    $this->_whereClauses[] = "{$this->_aliases['civicrm_activity']}.activity_type_id IN (" . implode(', ', array_keys($this->activityTypeIdOptions)) . ")";
 
     if ($this->_params['diagnosis_value']) {
       // Apply "any diagnosis" filter
@@ -487,7 +490,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
 
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
-dsm($statistics, '$statistics');
+
     // Get an abbreviated form of the report SQL, and use it to get a count of
     // distinct team contact_ids
     $sqlBase = $this->_getSqlBase();
@@ -515,7 +518,7 @@ dsm($statistics, '$statistics');
 
     $indentPrefix = '&nbsp; &nbsp; ';
 
-    foreach($this->activityTypeIdOptions as $activityTypeId => $activityTypeLabel) {
+    foreach ($this->activityTypeIdOptions as $activityTypeId => $activityTypeLabel) {
       $activityTypeCountQuery = "
         select count(distinct t.id)
         from (
@@ -526,7 +529,7 @@ dsm($statistics, '$statistics');
       $activityTypeCountParams = array(
         '1' => array($activityTypeId, 'Int'),
       );
-      $statistics['counts']['contact_count_'. $activityTypeId] = array(
+      $statistics['counts']['contact_count_' . $activityTypeId] = array(
         'title' => $indentPrefix . $activityTypeLabel,
         'value' => CRM_Core_DAO::singleValueQuery($activityTypeCountQuery, $activityTypeCountParams),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
