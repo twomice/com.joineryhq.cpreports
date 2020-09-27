@@ -194,27 +194,6 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             'dbAlias' => 'GROUP_CONCAT(civicrm_contact_assignedteam_civireport.id)',
           ),
         ),
-        'filters' => array(
-          'assignedteam_name' => array(
-            'name' => 'sort_name',
-            'title' => E::ts('Assigned Team Name'),
-            'operator' => 'like',
-            'type' => CRM_Report_Form::OP_STRING,
-          ),
-          'assignedteam_nick_name_like' => array(
-            'title' => E::ts('Assigned Team Nickname'),
-            'dbAlias' => 'civicrm_contact_assignedteam_civireport.nick_name',
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'assignedteam_nick_name_select' => array(
-            'title' => E::ts('Assigned Team Nickname'),
-            'dbAlias' => 'civicrm_contact_assignedteam_civireport.nick_name',
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $nickNameOptions,
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
         'grouping' => 'contact-fields',
       ),
       'civicrm_activity' => array(
