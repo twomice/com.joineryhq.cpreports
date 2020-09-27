@@ -487,7 +487,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
 
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
-
+dsm($statistics, '$statistics');
     // Get an abbreviated form of the report SQL, and use it to get a count of
     // distinct team contact_ids
     $sqlBase = $this->_getSqlBase();
