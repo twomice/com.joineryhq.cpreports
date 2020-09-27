@@ -313,9 +313,9 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       ";
     }
     $this->_from .= "
-      --  aclFrom:
+      -- aclFrom:
       {$this->_aclFrom}
-      --  ^^ aclFrom ^^
+      -- ^^ aclFrom ^^
     ";
   }
 
@@ -378,7 +378,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       // build a query based on this report, with no LIMIT clause.
       $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy}";
       // Use that sql as a subquery, grouping by sort_name and suming duration.
-      $query = "select civicrm_contact_assignee_sort_name,  sum(civicrm_activity_duration) as ct from ($sql) as subquery group by civicrm_contact_assignee_sort_name";
+      $query = "select civicrm_contact_assignee_sort_name, sum(civicrm_activity_duration) as ct from ($sql) as subquery group by civicrm_contact_assignee_sort_name";
       $dao = CRM_Core_DAO::executeQuery($query);
       // For each row, update the header totals for that sort_name.
       while ($dao->fetch()) {
@@ -583,7 +583,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
           $sqlBase
           having assignedteam_id IN (
-            select distinct civicrm_contact_target_civireport.id  as serving_team_id
+            select distinct civicrm_contact_target_civireport.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -603,7 +603,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
           $sqlBase
           having assignedteam_id IS NULL OR assignedteam_id NOT IN (
-            select distinct civicrm_contact_target_civireport.id  as serving_team_id
+            select distinct civicrm_contact_target_civireport.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -631,7 +631,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
             $sqlBase
           having assignedteam_id IN (
-            select distinct civicrm_contact_target_civireport.id  as serving_team_id
+            select distinct civicrm_contact_target_civireport.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -651,7 +651,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
             $sqlBase
           having assignedteam_id IS NULL OR assignedteam_id NOT IN (
-            select distinct civicrm_contact_target_civireport.id  as serving_team_id
+            select distinct civicrm_contact_target_civireport.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -679,7 +679,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
             $sqlBase
           having assignedteam_id IN (
-            select distinct civicrm_contact_target_civireport.id  as serving_team_id
+            select distinct civicrm_contact_target_civireport.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -699,7 +699,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
             $sqlBase
           having assignedteam_id is null or assignedteam_id not IN (
-            select distinct civicrm_contact_target_civireport.id  as serving_team_id
+            select distinct civicrm_contact_target_civireport.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -801,6 +801,94 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
           'type' => CRM_Utils_Type::T_INT,
         );
       }
+
+      $statistics['counts']['helptype_frequency_blank'] = array(
+        'title' => E::ts('Contact frequency per Help Type'),
+        'value' => '',
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_STRING,
+      );
+
+      $helpTypeFrequencyQuery = "
+        select activitycount, count(*) as cnt from (
+          select if(count(*) > 9, '10+', count(*)) as activitycount, id, helptype
+          from (
+          select civicrm_contact_assignee_civireport.id, value_service_detai_3_civireport.help_type_57 as helptype
+            $sqlBase
+          ) counts
+          where helptype = 'hc'
+          group by id, helptype
+        ) t
+        group by activitycount
+        order by cast(activitycount as unsigned)
+      ";
+      $dao = CRM_Core_DAO::executeQuery($helpTypeFrequencyQuery);
+      $hcHelpTypeLabel = $helpTypeLabels['HC'];
+      $hcHelpTypeCounts = [];
+      while ($dao->fetch()) {
+        $hcHelpTypeCounts[$dao->activitycount] = $dao->cnt;
+      }
+      for ($i = 1; $i <= 9; $i++) {
+        $statistics['counts']['helptype_frequency_' . $i] = array(
+          'title' => $indentPrefix . E::ts("Contacts with %1 \"%2\" activities", [
+            1 => $i,
+            2 => $hcHelpTypeLabel,
+          ]),
+          'value' => $hcHelpTypeCounts[$i] ?? 0,
+          // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+          'type' => CRM_Utils_Type::T_INT,
+        );
+      }
+      $i = '10+';
+      $statistics['counts']['helptype_frequency_' . $i] = array(
+        'title' => $indentPrefix . E::ts("Contacts with %1 \"%2\" activities", [
+          1 => $i,
+          2 => $hcHelpTypeLabel,
+        ]),
+        'value' => $hcHelpTypeCounts[$i] ?? 0,
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_INT,
+      );
+
+      $onlySeHelpTypeCountQuery = "
+        select count(*) as cnt from (
+          select id, group_concat(distinct helptype) as helptypes
+          from (
+          select civicrm_contact_assignee_civireport.id, value_service_detai_3_civireport.help_type_57 as helptype
+            $sqlBase
+          ) concats
+          group by id
+          having helptypes = 'SE'
+        ) t
+      ";
+      $statistics['counts']['helptype_frequency_SE'] = array(
+        'title' => $indentPrefix . E::ts("Contacts with only \"%1\" activities", [
+          1 => $helpTypeLabels['SE'],
+        ]),
+        'value' => CRM_Core_DAO::singleValueQuery($onlySeHelpTypeCountQuery),
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_INT,
+      );
+
+      $onlyXxHelpTypeCountQuery = "
+        select count(*) as cnt from (
+          select id, group_concat(distinct helptype) as helptypes
+          from (
+          select civicrm_contact_assignee_civireport.id, value_service_detai_3_civireport.help_type_57 as helptype
+            $sqlBase
+          ) concats
+          group by id
+          having helptypes = 'XX'
+        ) t
+      ";
+      $statistics['counts']['helptype_frequency_XX'] = array(
+        'title' => $indentPrefix . E::ts("Contacts with only \"%1\" activities", [
+          1 => $helpTypeLabels['XX'],
+        ]),
+        'value' => CRM_Core_DAO::singleValueQuery($onlyXxHelpTypeCountQuery),
+        // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+        'type' => CRM_Utils_Type::T_INT,
+      );
     }
     else {
       // Section header
@@ -816,32 +904,11 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
       );
-    }
-
-    // Section header
-    $statistics['counts']['contact_count_blank'] = array(
-      'title' => E::ts('Distinct contacts per activity type'),
-      'value' => '',
-      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
-      'type' => CRM_Utils_Type::T_STRING,
-    );
-
-    foreach ($this->activityTypeIdOptions as $activityTypeId => $activityTypeLabel) {
-      $activityTypeCountQuery = "
-        select count(distinct t.id)
-        from (
-          select civicrm_contact_assignee_civireport.id, activity_civireport.activity_type_id $sqlBase
-        ) t
-        where t.activity_type_id = %1
-      ";
-      $activityTypeCountParams = array(
-        '1' => array($activityTypeId, 'Int'),
-      );
-      $statistics['counts']['contact_count_' . $activityTypeId] = array(
-        'title' => $indentPrefix . $activityTypeLabel,
-        'value' => CRM_Core_DAO::singleValueQuery($activityTypeCountQuery, $activityTypeCountParams),
+      $statistics['counts']['helptype_frequency_blank'] = array(
+        'title' => E::ts('Contact frequency per Help Type'),
+        'value' => E::ts('(Please enable the "Help Type" column to reveal these statistics.)'),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => CRM_Utils_Type::T_STRING,
       );
     }
 
