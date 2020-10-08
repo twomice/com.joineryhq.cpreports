@@ -302,12 +302,25 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ON civicrm_value_health_5.entity_id = {$this->_aliases['civicrm_contact_assignee']}.id
     ";
     if ($this->isTableSelected('civicrm_contact_assignedteam')) {
+      list($from, $to) = $this->getFromTo($this->_params['activity_date_time_relative'] ?? NULL, $this->_params['activity_date_time_from'] ?? NULL, $this->_params['activity_date_time_to'] ?? NULL);
+      $activityDateTimeJoinConditions = [];
+      if ($from) {
+        $activityDateTimeJoinConditions[] = "(r.end_date IS NULL OR r.end_date >= $from)";
+      }
+      if ($to) {
+        $activityDateTimeJoinConditions[] = "(r.start_date IS NULL OR r.start_date <= $to)";
+      }
+      if (!empty($activityDateTimeJoinConditions)) {
+        $activityDateTimeJoinCondition = ' AND ' . implode(' AND ', $activityDateTimeJoinConditions);
+      }
+      else {
+        $activityDateTimeJoinCondition = '';
+      }
       $this->_from .= "
         LEFT JOIN civicrm_relationship r ON
           r.relationship_type_id = 18 -- is_team_client
-          AND r.is_active
-          AND (r.end_date IS NULL OR r.end_date > now())
           AND r.contact_id_b = {$this->_aliases['civicrm_contact_assignee']}.id
+          $activityDateTimeJoinCondition
         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact_assignedteam']}
           ON {$this->_aliases['civicrm_contact_assignedteam']}.id = r.contact_id_a
       ";
