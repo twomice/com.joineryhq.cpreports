@@ -349,7 +349,7 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
     $indivCount = CRM_Core_DAO::singleValueQuery("select count(distinct t.id) as cnt from ($sql) t");
 
     $statistics['counts']['individuals'] = array(
-      'title' => ts("Total Client(s)"),
+      'title' => E::ts("Total Client(s)"),
       'value' => $indivCount,
       // e.g. CRM_Utils_Type::T_STRING, defaul.t seems to be integer
       'type' => CRM_Utils_Type::T_INT,

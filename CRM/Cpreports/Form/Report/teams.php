@@ -200,7 +200,7 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
 
     foreach ($statusStats as $statusKey => $statusStat) {
       $statistics['counts']['status_' . $statusKey] = array(
-        'title' => ts("Team status is '%1'", array(1 => $statusStat['label'])),
+        'title' => E::ts("Team status is '%1'", array(1 => $statusStat['label'])),
         'value' => $statusStat['count'],
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,

@@ -487,7 +487,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       $dao = CRM_Core_DAO::executeQuery($query);
       while ($dao->fetch()) {
         $statistics['counts']['relationship_types_' . $dao->relationship_type_id] = array(
-          'title' => $indentPrefix . ts($dao->label),
+          'title' => $indentPrefix . E::ts($dao->label),
           'value' => $dao->cnt,
           // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
           'type' => CRM_Utils_Type::T_INT,
