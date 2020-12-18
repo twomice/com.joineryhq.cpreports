@@ -37,18 +37,20 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster_Duration extends CRM_Cprep
     inner join civicrm_value_participation_6 alias_civicrm_value_participation_6_civireport ON alias_civicrm_value_participation_6_civireport.entity_id = t.contact_id
     ";
     $statistics['counts']['total_days'] = array(
-      'title' => ts("Total of all client duration (days)"),
+      'title' => E::ts("Total of all client duration (days)"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
-      'type' => CRM_Utils_Type::T_INT  // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
     );
 
     //Average duration (based on all Team Clients processed)
     $totalRows = $statistics['counts']['rowCount']['value'] ?? $statistics['counts']['rowsFound']['value'];
     $avgValue = ($statistics['counts']['participation_ended_during']['value'] ? ($statistics['counts']['total_days']['value'] / $totalRows) : 'N/A');
     $statistics['counts']['average_duration'] = array(
-      'title' => ts("Average client duration (days)"),
+      'title' => E::ts("Average client duration (days)"),
       'value' => $avgValue,
-      'type' => (is_numeric($avgValue) ? CRM_Utils_Type::T_INT : CRM_Utils_Type::T_STRING), // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => (is_numeric($avgValue) ? CRM_Utils_Type::T_INT : CRM_Utils_Type::T_STRING),
     );
 
     return $statistics;

@@ -502,7 +502,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       ) t
     ";
     $statistics['counts']['contact_count_total'] = array(
-      'title' => ts('Total distinct contacts'),
+      'title' => E::ts('Total distinct contacts'),
       'value' => CRM_Core_DAO::singleValueQuery($distinctContactCountQuery),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -545,7 +545,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     ";
 
     $statistics['counts']['total_duration'] = array(
-      'title' => ts("Total duration"),
+      'title' => E::ts("Total duration"),
       'value' => CRM_Core_DAO::singleValueQuery($totalMinutesQuery),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,

@@ -560,7 +560,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       ) t
     ";
     $statistics['counts']['contact_count_total'] = array(
-      'title' => ts('Total distinct contacts'),
+      'title' => E::ts('Total distinct contacts'),
       'value' => CRM_Core_DAO::singleValueQuery($distinctContactCountQuery),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -573,7 +573,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       ) t
     ";
     $statistics['counts']['total_duration'] = array(
-      'title' => ts("Total duration"),
+      'title' => E::ts("Total duration"),
       'value' => CRM_Core_DAO::singleValueQuery($totalMinutesQuery),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -602,7 +602,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ) t
       ";
       $statistics['counts']['distinctAssignedTeamsContactCount'] = array(
-        'title' => $indentPrefix . ts('Contacts assigned to selected team(s)'),
+        'title' => $indentPrefix . E::ts('Contacts assigned to selected team(s)'),
         'value' => CRM_Core_DAO::singleValueQuery($distinctAssignedTeamsContactCountQuery),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
@@ -622,7 +622,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ) t
       ";
       $statistics['counts']['distinctNotAssignedTeamsContactCount'] = array(
-        'title' => $indentPrefix . ts('Contacts not assigned to selected team(s)'),
+        'title' => $indentPrefix . E::ts('Contacts not assigned to selected team(s)'),
         'value' => CRM_Core_DAO::singleValueQuery($distinctNotAssignedTeamsContactCountQuery),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
@@ -650,7 +650,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ) t
       ";
       $statistics['counts']['distinctAssignedTeamsActivityCount'] = array(
-        'title' => $indentPrefix . ts('Activities for contacts assigned to selected team(s)'),
+        'title' => $indentPrefix . E::ts('Activities for contacts assigned to selected team(s)'),
         'value' => CRM_Core_DAO::singleValueQuery($distinctAssignedTeamsActivityCountQuery),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
@@ -670,7 +670,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ) t
       ";
       $statistics['counts']['distinctNotAssignedTeamsActivityCount'] = array(
-        'title' => $indentPrefix . ts('Activities for contacts not assigned to selected team(s)'),
+        'title' => $indentPrefix . E::ts('Activities for contacts not assigned to selected team(s)'),
         'value' => CRM_Core_DAO::singleValueQuery($distinctNotAssignedTeamsActivityCountQuery),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
@@ -698,7 +698,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ) t
       ";
       $statistics['counts']['distinctAssignedTeamsDuration'] = array(
-        'title' => $indentPrefix . ts('Total duration for contacts assigned to selected team(s)'),
+        'title' => $indentPrefix . E::ts('Total duration for contacts assigned to selected team(s)'),
         'value' => CRM_Core_DAO::singleValueQuery($distinctAssignedTeamsDurationQuery),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
@@ -718,7 +718,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ) t
       ";
       $statistics['counts']['distinctNotAssignedTeamsDuration'] = array(
-        'title' => $indentPrefix . ts('Total duration for contacts not assigned to selected team(s)'),
+        'title' => $indentPrefix . E::ts('Total duration for contacts not assigned to selected team(s)'),
         'value' => CRM_Core_DAO::singleValueQuery($distinctNotAssignedTeamsDurationQuery),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,

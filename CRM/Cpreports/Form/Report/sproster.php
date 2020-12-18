@@ -314,7 +314,7 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
     $teamCount = CRM_Core_DAO::singleValueQuery("select count(distinct t.id) as cnt from ($sql) t");
 
     $statistics['counts']['teams'] = array(
-      'title' => ts("Total Team(s)"),
+      'title' => E::ts("Total Team(s)"),
       'value' => $teamCount,
       // e.g. CRM_Utils_Type::T_STRING, defaul.t seems to be integer
       'type' => CRM_Utils_Type::T_INT,
