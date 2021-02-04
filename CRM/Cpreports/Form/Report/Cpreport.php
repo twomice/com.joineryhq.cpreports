@@ -129,7 +129,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       // dsm(0, 'active_start');
     }
     $statistics['counts']['participation_active_start'] = array(
-      'title' => ts("{$titlePrefix}Participation active at start of analysis period"),
+      'title' => E::ts("{$titlePrefix}Participation active at start of analysis period"),
       'value' => $activeStartCount,
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -161,7 +161,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     ";
     // dsm($query, "-- ended during\n");
     $statistics['counts']['participation_ended_during'] = array(
-      'title' => ts("{$titlePrefix}Participation ended during analysis period"),
+      'title' => E::ts("{$titlePrefix}Participation ended during analysis period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -192,7 +192,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       )
     ";
     $statistics['counts']['participation_started_during'] = array(
-      'title' => ts("{$titlePrefix}Participation started during analysis period"),
+      'title' => E::ts("{$titlePrefix}Participation started during analysis period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -219,7 +219,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     $query = "select count(distinct entity_id) from civicrm_value_participation_6 where $activeEndWhere entity_id IN (SELECT {$this->_aliases['civicrm_contact_indiv']}.id {$sqlBase})";
     //     dsm($query, "-- active end\n");
     $statistics['counts']['participation_active_end'] = array(
-      'title' => ts("{$titlePrefix}Participation active at end of analysis period"),
+      'title' => E::ts("{$titlePrefix}Participation active at end of analysis period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -248,7 +248,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       // dsm(0, 'active_start');
     }
     $statistics['counts']['active_start'] = array(
-      'title' => ts("{$titlePrefix}Relationships active at start of analysis period"),
+      'title' => E::ts("{$titlePrefix}Relationships active at start of analysis period"),
       'value' => $activeStartCount,
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -284,7 +284,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     ";
     // dsm($query, "-- ended during\n");
     $statistics['counts']['ended_during'] = array(
-      'title' => ts("{$titlePrefix}Relationships ended during analysis period"),
+      'title' => E::ts("{$titlePrefix}Relationships ended during analysis period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -319,7 +319,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     }
     // dsm($query, "-- begun during\n");
     $statistics['counts']['started_during'] = array(
-      'title' => ts("{$titlePrefix}Relationships begun during analysis period"),
+      'title' => E::ts("{$titlePrefix}Relationships begun during analysis period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -346,7 +346,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     $query = "select count(distinct contact_id_b) from civicrm_relationship where {$activeEndWhere} id IN (SELECT {$this->_aliases['civicrm_relationship']}.id {$sqlBase})";
     // dsm($query, "-- active end\n");
     $statistics['counts']['active_end'] = array(
-      'title' => ts("{$titlePrefix}Relationships active at end of analysis period"),
+      'title' => E::ts("{$titlePrefix}Relationships active at end of analysis period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -362,7 +362,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     // Total distinct client contacts.
     $query = "SELECT COUNT(DISTINCT t.id) from (SELECT contact_indiv_civireport.id {$sqlBase}) t";
     $statistics['counts']['total_clients'] = array(
-      'title' => ts("Total distinct clients"),
+      'title' => E::ts("Total distinct clients"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -438,7 +438,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
         $statValue = CRM_Core_DAO::singleValueQuery($query, $queryParams);
         $dispositionTotal += $statValue;
         $statistics['counts']["disposition-{$optionValue}"] = array(
-          'title' => ts("{$indentPrefix}{$optionLabel}"),
+          'title' => E::ts("{$indentPrefix}{$optionLabel}"),
           'value' => $statValue,
           // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
           'type' => CRM_Utils_Type::T_INT,
@@ -494,7 +494,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       $statValue = CRM_Core_DAO::singleValueQuery($query, $queryParams);
       $genderTotal += $statValue;
       $statistics['counts']["gender-{$optionValue}"] = array(
-        'title' => ts("{$indentPrefix}{$optionLabel}"),
+        'title' => E::ts("{$indentPrefix}{$optionLabel}"),
         'value' => $statValue,
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
@@ -563,7 +563,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
               2 => [$genderOptionValue, 'Int'],
             ];
             $statistics['counts']["sex-race-{$raceOptionValue}-{$genderOptionValue}"] = array(
-              'title' => ts("{$indentPrefix}{$raceOptionLabel}, {$genderOptionLabel}"),
+              'title' => E::ts("{$indentPrefix}{$raceOptionLabel}, {$genderOptionLabel}"),
               'value' => CRM_Core_DAO::singleValueQuery($query, $queryParams),
               // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
               'type' => CRM_Utils_Type::T_INT,
@@ -596,7 +596,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
               AND customtable.{$raceCustomFieldColumnName} NOT IN (" . implode($raceSqlPlaceholders, ',') . ")
           ";
           $statistics['counts']["sex-race_other-{$genderOptionValue}"] = array(
-            'title' => ts("{$indentPrefix}Other, {$genderOptionLabel}"),
+            'title' => E::ts("{$indentPrefix}Other, {$genderOptionLabel}"),
             'value' => CRM_Core_DAO::singleValueQuery($query, $queryParams),
             // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
             'type' => CRM_Utils_Type::T_INT,

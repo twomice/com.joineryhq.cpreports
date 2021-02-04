@@ -253,7 +253,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
 
     //Net change in active Service Providers
     $statistics['counts']['net_change'] = array(
-      'title' => ts("Net change in active Service Providers"),
+      'title' => E::ts("Net change in active Service Providers"),
       'value' => ($statistics['counts']['active_end']['value'] - $statistics['counts']['active_start']['value']),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -262,7 +262,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     //Total Service Providers processed (Active and Terminated)
     $query = "select count(distinct contact_id_b) from civicrm_relationship where id IN (SELECT {$this->_aliases['civicrm_relationship']}.id {$sqlBase})";
     $statistics['counts']['total_processed'] = array(
-      'title' => ts("Total Service Providers processed (Active and Terminated)"),
+      'title' => E::ts("Total Service Providers processed (Active and Terminated)"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -271,7 +271,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     //Total composite duration of all service providers (days)
     $query = "select sum({$this->_columns['civicrm_relationship']['fields']['days_active']['dbAlias']}) {$sqlBase}";
     $statistics['counts']['total_days'] = array(
-      'title' => ts("Total composite duration of all service providers (days)"),
+      'title' => E::ts("Total composite duration of all service providers (days)"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
@@ -279,7 +279,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
 
     //Average duration (based on all Service Providers processed
     $statistics['counts']['average_duration'] = array(
-      'title' => ts("Average duration (based on all Service Providers processed)"),
+      'title' => E::ts("Average duration (based on all Service Providers processed)"),
       'value' => ($statistics['counts']['total_processed']['value'] ? ($statistics['counts']['total_days']['value'] / $statistics['counts']['total_processed']['value']) : 0),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
