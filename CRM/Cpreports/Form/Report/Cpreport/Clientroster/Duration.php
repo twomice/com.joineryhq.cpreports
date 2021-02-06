@@ -44,7 +44,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster_Duration extends CRM_Cprep
     );
 
     //Average duration (based on all Team Clients processed)
-    $totalRows = $statistics['counts']['rowCount']['value'] ?? $statistics['counts']['rowsFound']['value'];
+    $totalRows = $statistics['counts']['rowsFound']['value'] ?? $statistics['counts']['rowCount']['value'];
     $avgValue = ($statistics['counts']['participation_ended_during']['value'] ? ($statistics['counts']['total_days']['value'] / $totalRows) : 'N/A (none ended during this period)');
     $statistics['counts']['average_duration'] = array(
       'title' => E::ts("Average client duration (days)"),
