@@ -265,7 +265,7 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
 
   public function groupBy() {
     if ($this->isTableSelected('civicrm_phone')) {
-      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact_indiv']}.id";
+      $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact_indiv']}.id, {$this->_aliases['civicrm_contact_team']}.id";
     }
   }
 
