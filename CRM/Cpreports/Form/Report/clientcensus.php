@@ -180,6 +180,18 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
             'title' => E::ts('End Date'),
           ),
         ),
+        'filters' => array(
+          'is_active' => array(
+            'title' => ts('Relationship Status'),
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => array(
+              '' => ts('- Any -'),
+              1 => ts('Active'),
+              0 => ts('Inactive'),
+            ),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+        ),
         'grouping' => 'relationship-fields',
       ),
     );
