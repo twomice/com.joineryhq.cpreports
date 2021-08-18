@@ -4,6 +4,11 @@ use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreports_Form_Report_Cpreport {
 
+  /**
+   * @inheritdoc
+   */
+  protected $_useFilterParticipationDates = TRUE;
+
   protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
   protected $_customGroupGroupBy = FALSE;
   protected $_customFields = array();
@@ -148,7 +153,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
-    $this->_addFilterParticipationDates();
 
     parent::__construct();
     $this->_columns['alias_civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';

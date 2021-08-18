@@ -11,6 +11,18 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   protected $_participationDateTo;
   protected $_participationDateFrom;
 
+  /**
+   * @var Boolean. Whether or not to include Participation Dates filter
+   */
+  protected $_useFilterParticipationDates;
+
+  public function __construct() {
+    if ($this->_useFilterParticipationDates) {
+      $this->_addFilterParticipationDates();
+    }
+    parent::__construct();
+  }
+
   public function beginPostProcess() {
     parent::beginPostProcess();
 
