@@ -344,4 +344,56 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
     }
   }
 
+  /**
+   * Add a row for "has relationship ending during date range" to $statistics.
+   */
+  public function _addStatisticRelationshipParticipationEndedDuring(&$statistics, $titlePrefix = '') {
+    if (!$this->_useColumnRelationshipDaysParticipatedAndDerivedStatistics) {
+      // If this is not set, we won't have the appropriate joins in $this->_from, so we
+      // should just return now.
+      return;
+    }
+
+    $sqlBase = $this->_getSqlBase();
+
+    //Has team relationships ended during analysis period
+    if ($this->_relationshipParticipationDateFrom && $this->_relationshipParticipationDateTo) {
+      // If we're filtering for a period with fixed FROM and TO dates, then filter
+      // for relationships ending between those dates:
+      $where = "WHERE r.end_date BETWEEN {$this->_relationshipParticipationDateFrom} AND {$this->_relationshipParticipationDateTo}";
+    }
+    else if ($this->_relationshipParticipationDateFrom) {
+      // If we're only filtering for period with a given FROM date, then filter for
+      // relationships ending between that date and now.
+      $where = "WHERE r.end_date BETWEEN {$this->_relationshipParticipationDateFrom} AND now()";
+    }
+    else if ($this->_relationshipParticipationDateTo) {
+      // If we're only filtering for period with a given TO date, then filter for
+      // relationships ending before that date.
+      $where = "WHERE r.end_date <= {$this->_relationshipParticipationDateTo}";
+    }
+    else {
+      // Otherwise, neither date is set, i.e. the "analysis period" includes "all time";
+      // therefore we want to count any relationship that has an end date.
+      $where = "WHERE r.end_date IS NOT NULL";
+    }
+    $query = "
+      select count(distinct t.id)
+      from civicrm_relationship r
+      inner join (
+          select contact_indiv_civireport.id
+          $sqlBase
+      ) t
+      on t.id = r.contact_id_b
+            AND r.relationship_type_id = 18
+      {$where}
+    ";
+    $statistics['counts']['participation_ended_during'] = array(
+      'title' => E::ts("{$titlePrefix}Clients with relationships ending during analysis period"),
+      'value' => CRM_Core_DAO::singleValueQuery($query),
+      // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
+      'type' => CRM_Utils_Type::T_INT,
+    );
+  }
+
 }
