@@ -11,7 +11,7 @@ return array(
     'params' =>
     array(
       'version' => 3,
-      'label' => 'Client Roster: Duration',
+      'label' => 'Client Roster: Duration - service dates',
       'description' => '',
       'class_name' => 'CRM_Cpreports_Form_Report_Cpreport_Clientroster_Duration',
       'report_url' => 'cpreports/clientroster/duration',
