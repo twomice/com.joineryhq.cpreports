@@ -44,7 +44,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster_DurationRelationship exten
     if ($from) {
       $this->_serviceDateFrom = $from;
     }
-//    $this->_addStatisticParticipationEndedDuring($statistics);
+    $this->_addStatisticRelationshipParticipationEndedDuring($statistics);
 
     $sqlBase = $this->_getSqlBase();
 
