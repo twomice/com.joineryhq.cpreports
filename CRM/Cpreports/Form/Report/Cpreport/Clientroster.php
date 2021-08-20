@@ -17,7 +17,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
   /**
    * @var Boolean. Whether or not to include relationship-dates-based "Days Participated" column
    */
-  protected $_useColumnRelationshipDaysParticipated;
+  protected $_useColumnRelationshipDaysParticipatedAndDerivedStatistics;
 
   protected $_customGroupExtends = array('Individual', 'Contact');
   protected $_customGroupGroupBy = FALSE;
@@ -200,7 +200,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         'default' => FALSE,
       ];
     }
-    if ($this->_useColumnRelationshipDaysParticipated) {
+    if ($this->_useColumnRelationshipDaysParticipatedAndDerivedStatistics) {
       $this->_columns['relationship_days_participated']['alias'] = 'relationship_days_participated';
       $this->_columns['relationship_days_participated']['grouping'] = 'civicrm_value_participation_6';
       $this->_columns['relationship_days_participated']['fields']['relationship_days_participated'] = [
@@ -253,9 +253,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
 
     $this->_addParticipationDatesFrom('civicrm_contact_indiv');
 
-    if ($this->_useColumnRelationshipDaysParticipated
-      && $this->isTableSelected('relationship_days_participated')
-    ) {
+    if ($this->_useColumnRelationshipDaysParticipatedAndDerivedStatistics) {
       $this->_from .= "
         LEFT JOIN civicrm_relationship {$this->_aliases['relationship_days_participated']}
             ON {$this->_aliases['relationship_days_participated']}.contact_id_b = {$this->_aliases['civicrm_contact_indiv']}.id

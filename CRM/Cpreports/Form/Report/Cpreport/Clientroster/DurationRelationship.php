@@ -16,7 +16,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster_DurationRelationship exten
   /**
    * @inheritdoc
    */
-  protected $_useColumnRelationshipDaysParticipated = TRUE;
+  protected $_useColumnRelationshipDaysParticipatedAndDerivedStatistics = TRUE;
 
   public function __construct() {
     parent::__construct();
