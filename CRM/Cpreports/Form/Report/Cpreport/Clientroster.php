@@ -14,6 +14,11 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
    */
   protected $_useColumnDaysParticipated;
 
+  /**
+   * @var Boolean. Whether or not to include relationship-dates-based "Days Participated" column
+   */
+  protected $_useColumnRelationshipDaysParticipated;
+
   protected $_customGroupExtends = array('Individual', 'Contact');
   protected $_customGroupGroupBy = FALSE;
   protected $_customFields = array();
@@ -195,6 +200,22 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         'default' => FALSE,
       ];
     }
+    if ($this->_useColumnRelationshipDaysParticipated) {
+      $this->_columns['relationship_days_participated']['alias'] = 'relationship_days_participated';
+      $this->_columns['relationship_days_participated']['grouping'] = 'civicrm_value_participation_6';
+      $this->_columns['relationship_days_participated']['fields']['relationship_days_participated'] = [
+        'title' => E::ts('Days Participated (relationships)'),
+        // Days Participated (relationships) is the total days from start of earliest 'team client' relationship
+        // to end of latest 'team client' relationship for each, regardless of other filters.
+        'dbAlias' => '
+          DATEDIFF(
+            max(if (relationship_days_participated_civireport.end_date is null OR relationship_days_participated_civireport.end_date > now(), curdate(), relationship_days_participated_civireport.end_date) ) ,
+            min(relationship_days_participated_civireport.start_date)
+          )
+        ',
+        'default' => FALSE,
+      ];
+    }
 
   }
 
@@ -229,7 +250,18 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
           ON {$this->_aliases['civicrm_address']}.is_primary AND {$this->_aliases['civicrm_address']}.contact_id = {$this->_aliases['civicrm_contact_indiv']}.id
       ";
     }
+
     $this->_addParticipationDatesFrom('civicrm_contact_indiv');
+
+    if ($this->_useColumnRelationshipDaysParticipated
+      && $this->isTableSelected('relationship_days_participated')
+    ) {
+      $this->_from .= "
+        LEFT JOIN civicrm_relationship {$this->_aliases['relationship_days_participated']}
+            ON {$this->_aliases['relationship_days_participated']}.contact_id_b = {$this->_aliases['civicrm_contact_indiv']}.id
+            AND {$this->_aliases['relationship_days_participated']}.relationship_type_id = 18
+      ";
+    }
     $this->_from .= "
       -- end from()
 
