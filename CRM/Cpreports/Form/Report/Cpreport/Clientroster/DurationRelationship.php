@@ -51,7 +51,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster_DurationRelationship exten
     //Total "days participated (relationships)" values
     $query = "
       SELECT
-        SUM (relationship_days_participated)
+        SUM(relationship_days_participated)
       FROM (
         SELECT {$this->_columns['relationship_days_participated']['fields']['relationship_days_participated']['dbAlias']} as relationship_days_participated
             -- sqlbase >>>>
