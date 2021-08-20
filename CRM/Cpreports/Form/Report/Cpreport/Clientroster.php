@@ -9,6 +9,11 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
    */
   protected $_useFilterParticipationDates = TRUE;
 
+  /**
+   * @var Boolean. Whether or not to include participation-dates-based "Days Participated" column
+   */
+  protected $_useColumnDaysParticipated;
+
   protected $_customGroupExtends = array('Individual', 'Contact');
   protected $_customGroupGroupBy = FALSE;
   protected $_customFields = array();
@@ -181,13 +186,15 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
 
     parent::__construct();
 
-    $this->_columns['alias_civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
-    $this->_columns['alias_civicrm_value_participation_6']['grouping'] = 'civicrm_value_participation_6';
-    $this->_columns['alias_civicrm_value_participation_6']['fields']['days_participated'] = [
-      'title' => E::ts('Days Participated'),
-      'dbAlias' => 'IF (alias_civicrm_value_participation_6_civireport.service_began_3 IS NOT NULL, DATEDIFF(IFNULL(alias_civicrm_value_participation_6_civireport.disposition_date_46, NOW()), alias_civicrm_value_participation_6_civireport.service_began_3), "")',
-      'default' => FALSE,
-    ];
+    if ($this->_useColumnDaysParticipated) {
+      $this->_columns['alias_civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
+      $this->_columns['alias_civicrm_value_participation_6']['grouping'] = 'civicrm_value_participation_6';
+      $this->_columns['alias_civicrm_value_participation_6']['fields']['days_participated'] = [
+        'title' => E::ts('Days Participated'),
+        'dbAlias' => 'IF (alias_civicrm_value_participation_6_civireport.service_began_3 IS NOT NULL, DATEDIFF(IFNULL(alias_civicrm_value_participation_6_civireport.disposition_date_46, NOW()), alias_civicrm_value_participation_6_civireport.service_began_3), "")',
+        'default' => FALSE,
+      ];
+    }
 
   }
 
