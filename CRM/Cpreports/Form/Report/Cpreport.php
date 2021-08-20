@@ -16,11 +16,19 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
    */
   protected $_useFilterParticipationDates;
 
+  /**
+   * @var Boolean. Whether or not to include relationship-based Participation Dates filter
+   */
+  protected $_useFilterRelationshipParticipationDates;
+
   public function __construct() {
+    parent::__construct();
     if ($this->_useFilterParticipationDates) {
       $this->_addFilterParticipationDates();
     }
-    parent::__construct();
+    if ($this->_useFilterRelationshipParticipationDates) {
+      $this->_addFilterRelationshipParticipationDates();
+    }
   }
 
   public function beginPostProcess() {
@@ -55,6 +63,19 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     if ($from) {
       $this->_participationDateFrom = $from;
       $this->_whereClauses[] = "( {$this->_aliases['filter_civicrm_value_participation_6']}.disposition_date_46 IS NULL OR {$this->_aliases['filter_civicrm_value_participation_6']}.disposition_date_46 >= {$this->_participationDateFrom} )";
+    }
+
+    // Handle 'relationship_participation_dates' f{ilter:
+    // Convert relationship_participation_dates 'from' and 'to' params into max start date and min end date, respectively.
+    // NOTE: Assumes existence of `civicrm_relationship` as `r` in $this->_from.
+    list($from, $to) = $this->getFromTo($this->_params['relationship_participation_dates_relative'] ?? NULL, $this->_params['relationship_participation_dates_from'] ?? NULL, $this->_params['relationship_participation_dates_to'] ?? NULL);
+    if ($to) {
+      $this->_relationshipParticipationDateTo = $to;
+      $this->_whereClauses[] = "( r.start_date IS NULL or r.start_date <= {$this->_relationshipParticipationDateTo} )";
+    }
+    if ($from) {
+      $this->_relationshipParticipationDateFrom = $from;
+      $this->_whereClauses[] = "( r.end_date IS NULL or r.end_date >= {$this->_relationshipParticipationDateFrom} )";
     }
   }
 
@@ -113,6 +134,18 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
     ];
     $this->_columns['filter_civicrm_value_participation_6']['filters']['participation_dates'] = array(
       'title' => E::ts('Participation dates'),
+      'pseudofield' => TRUE,
+      'type' => CRM_Utils_Type::T_DATE,
+      'operatorType' => CRM_Report_Form::OP_DATE,
+    );
+  }
+
+  /**
+   * Add filter for service_dates to $this->_columns.
+   */
+  public function _addFilterRelationshipParticipationDates() {
+    $this->_columns['civicrm_contact_team']['filters']['relationship_participation_dates'] = array(
+      'title' => E::ts('Participation dates (relationships)'),
       'pseudofield' => TRUE,
       'type' => CRM_Utils_Type::T_DATE,
       'operatorType' => CRM_Report_Form::OP_DATE,
