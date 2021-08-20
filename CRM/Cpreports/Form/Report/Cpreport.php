@@ -10,6 +10,8 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   protected $_serviceDateFrom;
   protected $_participationDateTo;
   protected $_participationDateFrom;
+  protected $_relationshipParticipationDateTo;
+  protected $_relationshipParticipationDateFrom;
 
   /**
    * @var Boolean. Whether or not to include Participation Dates filter
