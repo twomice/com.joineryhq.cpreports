@@ -75,18 +75,14 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
     }
 
     // Populate list of options for the activity_type_id filter
-    $activityType = civicrm_api3('optionValue', 'get', [
+    $result = civicrm_api3('OptionValue', 'get', [
       'sequential' => 1,
-      'name' => 'Service hours',
-      'option_group_id' => "activity_type",
+      'option_group_id' => 'activity_type',
+      'name' => ['IN' => ['service hours', 'client service hours', 'legacy service hours']],
     ]);
-    $this->activityTypeIdOptions[$activityType['values'][0]['value']] = $activityType['values'][0]['label'];
-    $activityType = civicrm_api3('optionValue', 'get', [
-      'sequential' => 1,
-      'name' => 'Client Service Hours',
-      'option_group_id' => "activity_type",
-    ]);
-    $this->activityTypeIdOptions[$activityType['values'][0]['value']] = $activityType['values'][0]['label'];
+    foreach ($result['values'] as $value) {
+      $this->activityTypeIdOptions[$value['value']] = $value['label'];
+    }
 
     // Build a list of options for the diagnosis select filter (all diagnosis options)
     $customFieldId_diagnosis1 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_1', 'Health');
