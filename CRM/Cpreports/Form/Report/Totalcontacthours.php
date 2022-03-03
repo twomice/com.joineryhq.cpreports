@@ -778,7 +778,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       $i = 0;
       while ($dao->fetch()) {
         $statistics['counts']['helptype_count_' . $i++] = array(
-          'title' => $indentPrefix . $helpTypeLabels[$dao->helptype],
+          'title' => $indentPrefix . CRM_Utils_Array::value($dao->helptype, $helpTypeLabels, '[NONE SPECIFIED]'),
           'value' => $dao->cnt,
           // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
           'type' => CRM_Utils_Type::T_INT,
@@ -804,7 +804,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       $i = 0;
       while ($dao->fetch()) {
         $statistics['counts']['helptype_duration_' . $i++] = array(
-          'title' => $indentPrefix . $helpTypeLabels[$dao->helptype],
+          'title' => $indentPrefix . CRM_Utils_Array::value($dao->helptype, $helpTypeLabels, '[NONE SPECIFIED]'),
           'value' => $dao->durationsum,
           // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
           'type' => CRM_Utils_Type::T_INT,
