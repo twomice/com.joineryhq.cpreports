@@ -160,12 +160,21 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
       ),
       'civicrm_address' => array(
         'fields' => array(
+          'street_address' => array(
+            'title' => E::ts('Street Address'),
+          ),
+          'supplemental_address_1' => array(
+            'title' => E::ts('Supplemental Address 1'),
+          ),
           'city' => array(
             'title' => E::ts('City'),
           ),
           'county_id' => array(
             'title' => E::ts('County'),
             'alter_display' => 'alterCountyID',
+          ),
+          'postal_code' => array(
+            'title' => E::ts('Postal Code'),
           ),
         ),
         'filters' => array(
