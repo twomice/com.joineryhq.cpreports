@@ -15,6 +15,9 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
 
   /**
    * @var Boolean. Whether or not to include Participation Dates filter
+   *  This is a pseudo-field filter, which allows date-filter functionality based on
+   *  the entire range of dates defined by Client Participation: Service Began
+   *  and Client Participation: Disposition Date.
    */
   protected $_useFilterParticipationDates;
 
@@ -24,13 +27,13 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
   protected $_useFilterRelationshipParticipationDates;
 
   public function __construct() {
-    parent::__construct();
     if ($this->_useFilterParticipationDates) {
       $this->_addFilterParticipationDates();
     }
     if ($this->_useFilterRelationshipParticipationDates) {
       $this->_addFilterRelationshipParticipationDates();
     }
+    parent::__construct();
   }
 
   public function beginPostProcess() {
