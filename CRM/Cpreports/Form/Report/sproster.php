@@ -174,14 +174,10 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
         'street_unit',
         'street_number',
         'street_name',
-        'county_id',
         'id',
         'location_type_id',
         'country_id',
         'postal_code_suffix',
-      ),
-      'filters' => array(
-        'address_street_address',
       ),
     );
     $this->_columns += $this->getAddressColumns($addressOptions);
@@ -192,7 +188,7 @@ class CRM_Cpreports_Form_Report_sproster extends CRM_Report_Form {
     unset($this->_columns['civicrm_address']['filters']['address_street_number']);
     unset($this->_columns['civicrm_address']['filters']['address_street_name']);
     unset($this->_columns['civicrm_address']['filters']['address_postal_code_suffix']);
-    unset($this->_columns['civicrm_address']['filters']['address_county_id']);
+    unset($this->_columns['civicrm_address']['filters']['address_country_id']);
 
     parent::__construct();
   }
