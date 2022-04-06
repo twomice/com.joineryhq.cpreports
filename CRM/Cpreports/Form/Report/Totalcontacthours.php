@@ -78,7 +78,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
     $result = civicrm_api3('OptionValue', 'get', [
       'sequential' => 1,
       'option_group_id' => 'activity_type',
-      'name' => ['IN' => ['service hours', 'client service hours', 'legacy service hours', 'DEPRECATED: Team enablement hours per month']],
+      'name' => ['IN' => ['service hours', 'client service hours', 'legacy service hours']],
     ]);
     foreach ($result['values'] as $value) {
       $this->activityTypeIdOptions[$value['value']] = $value['label'];
