@@ -197,28 +197,8 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
-    $addressOptions = array(
-      'fields_excluded' => array(
-        'is_primary',
-        'name',
-        'street_unit',
-        'street_number',
-        'street_name',
-        'id',
-        'location_type_id',
-        'country_id',
-        'postal_code_suffix',
-      ),
-    );
-    $this->_columns += $this->getAddressColumns($addressOptions);
 
-    // Remove some unneeded address filters. They clutter the space. Tried but
-    // failed finding options to put in $addressOptions to prevent them from
-    // being added in the first place.
-    unset($this->_columns['civicrm_address']['filters']['address_street_number']);
-    unset($this->_columns['civicrm_address']['filters']['address_street_name']);
-    unset($this->_columns['civicrm_address']['filters']['address_postal_code_suffix']);
-    unset($this->_columns['civicrm_address']['filters']['address_country_id']);
+    $this->_columns += CRM_Cpreports_Utils::getAddressColumns();
 
     parent::__construct();
 
@@ -292,16 +272,11 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
   }
 
   public function alterDisplay(&$rows) {
+    CRM_Cpreports_Utils::alterDisplayAddress($rows);
+
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
-
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
 
       if (array_key_exists('civicrm_contact_indiv_gender_id', $row)) {
         if ($value = $row['civicrm_contact_indiv_gender_id']) {

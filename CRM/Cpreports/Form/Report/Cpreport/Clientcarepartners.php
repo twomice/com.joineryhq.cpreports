@@ -109,33 +109,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_address' => array(
-        'fields' => array(
-          'city' => array(
-            'title' => E::ts('City'),
-          ),
-          'county_id' => array(
-            'title' => E::ts('County'),
-            'alter_display' => 'alterCountyID',
-          ),
-        ),
-        'filters' => array(
-          // This can't be called 'county_id'. If it is, CRM_Report_Form will
-          // create a chain-select filter with ALL counties, i.e., if we name  it
-          // that then we can't control the available options.
-          // So we name it 'the_county_id' and use the `name` parameter to make
-          // civireport aware of the correct column to use; this doesn't
-          // trigger CRM_Report_Form's "too smart for you" auto-creation of options.
-          'the_county_id' => array(
-            'name' => 'county_id',
-            'title' => E::ts('County'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_BAO_Address::buildOptions('county_id', NULL, ['state_province_id' => 1042]),
-          ),
-        ),
-        'grouping' => 'relationship-fields',
-      ),
       $this->_tempTableName => array(
         'fields' => array(
           'carepartner_contact_id' => array(
@@ -153,6 +126,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
+
+    $this->_columns += CRM_Cpreports_Utils::getAddressColumns();
 
     parent::__construct();
     $this->_columns['alias_civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
@@ -355,6 +330,9 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
   }
 
   public function alterDisplay(&$rows) {
+
+    CRM_Cpreports_Utils::alterDisplayAddress($rows);
+
     // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
