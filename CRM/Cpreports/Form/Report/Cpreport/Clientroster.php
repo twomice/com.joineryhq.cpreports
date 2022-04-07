@@ -24,22 +24,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
   protected $_customFields = array();
 
   public function __construct() {
-    // Build a list of options for the nick_name select filter (all existing team nicknames)
-    $nickNameOptions = array();
-    $dao = CRM_Core_DAO::executeQuery(
-        '
-      SELECT DISTINCT nick_name
-      FROM civicrm_contact
-      WHERE
-        contact_type = "Organization"
-        AND contact_sub_type LIKE "%team%"
-        AND nick_name > ""
-      ORDER BY nick_name
-    '
-    );
-    while ($dao->fetch()) {
-      $nickNameOptions[$dao->nick_name] = $dao->nick_name;
-    }
 
     // Build a list of options for the diagnosis select filter (all diagnosis options)
     $customFieldId_diagnosis1 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_1', 'Health');
@@ -118,51 +102,12 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_contact_team' => array(
-        'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name(s)'),
-            'required' => FALSE,
-            'default' => TRUE,
-            'grouping' => 'team-fields',
-            'dbAlias'  => "GROUP_CONCAT(DISTINCT contact_team_civireport.organization_name ORDER BY contact_team_civireport.organization_name DESC SEPARATOR '<BR /> ')",
-          ),
-          'nick_name' => array(
-            'title' => E::ts('Team Nickname(s)'),
-            'required' => FALSE,
-            'default' => TRUE,
-            'grouping' => 'team-fields',
-            'dbAlias'  => "GROUP_CONCAT(DISTINCT contact_team_civireport.nick_name ORDER BY contact_team_civireport.nick_name DESC SEPARATOR '<BR /> ')",
-          ),
-        ),
-        'filters' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name'),
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'nick_name_like' => array(
-            'title' => E::ts('Team Nickname'),
-            'dbAlias' => 'contact_team_civireport.nick_name',
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'nick_name_select' => array(
-            'title' => E::ts('Team Nickname'),
-            'dbAlias' => 'contact_team_civireport.nick_name',
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $nickNameOptions,
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'grouping' => 'contact-fields',
-      ),
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
     $this->_columns += CRM_Cpreports_Utils::getAddressColumns();
+    $this->_columns += CRM_Cpreports_Utils::getTeamColumns();
 
     parent::__construct();
 
@@ -283,6 +228,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
 
   public function alterDisplay(&$rows) {
     CRM_Cpreports_Utils::alterDisplayAddress($rows);
+    CRM_Cpreports_Utils::alterDisplayTeam($rows);
 
     // custom code to alter rows
     $entryFound = FALSE;

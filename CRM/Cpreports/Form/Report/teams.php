@@ -21,70 +21,13 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
     ));
     $this->customFields_teamDetails = CRM_Utils_Array::rekey($customFieldsGet['values'], 'name');
 
-    // Build a list of options for the nick_name select filter (all existing team nicknames)
-    $nickNameOptions = array();
-    $dao = CRM_Core_DAO::executeQuery('
-      SELECT DISTINCT nick_name
-      FROM civicrm_contact
-      WHERE
-        contact_type = "Organization"
-        AND contact_sub_type LIKE "%team%"
-        AND nick_name > ""
-      ORDER BY nick_name
-    ');
-    while ($dao->fetch()) {
-      $nickNameOptions[$dao->nick_name] = $dao->nick_name;
-    }
-
     $this->_columns = array(
-      'civicrm_contact' => array(
-        'fields' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name'),
-            'default' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'nick_name' => array(
-            'title' => E::ts('Nickname'),
-            'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name'),
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'nick_name_like' => array(
-            'title' => E::ts('Team Nickname'),
-            'dbAlias' => 'contact_civireport.nick_name',
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'nick_name_select' => array(
-            'title' => E::ts('Team Nickname'),
-            'dbAlias' => 'contact_civireport.nick_name',
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $nickNameOptions,
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'order_bys' => array(
-          'organization_name' => array(
-            'title' => E::ts('Team Name'),
-          ),
-          'nick_name' => array(
-            'title' => E::ts('Nickname'),
-          ),
-        ),
-        'grouping' => 'contact-fields',
-      ),
+      'civicrm_contact' => array(),
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
+
+    $this->_columns += CRM_Cpreports_Utils::getTeamColumns();
 
     parent::__construct();
 
@@ -103,7 +46,10 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
 
   public function from() {
     $this->_from = "
-      FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
+      FROM
+        civicrm_contact {$this->_aliases['civicrm_contact_team']}
+        INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contact_team']}.id
+        {$this->_aclFrom}
     ";
     $this->_from .= "
       -- end from()
@@ -114,48 +60,17 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
   public function where() {
     parent::where();
     $this->_where .= "
-      AND {$this->_aliases['civicrm_contact']}.contact_type = 'organization'
-      AND {$this->_aliases['civicrm_contact']}.contact_sub_type LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . 'Team' . CRM_Core_DAO::VALUE_SEPARATOR . "%'
+      AND {$this->_aliases['civicrm_contact_team']}.contact_type = 'organization'
+      AND {$this->_aliases['civicrm_contact_team']}.contact_sub_type LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . 'Team' . CRM_Core_DAO::VALUE_SEPARATOR . "%'
     ";
   }
 
   public function alterDisplay(&$rows) {
-    // custom code to alter rows
-    $entryFound = FALSE;
-    foreach ($rows as $rowNum => $row) {
-
-      if (array_key_exists('civicrm_contact_organization_name', $row) &&
-        $rows[$rowNum]['civicrm_contact_organization_name'] &&
-        array_key_exists('civicrm_contact_id', $row)
-      ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
-          'reset=1&cid=' . $row['civicrm_contact_id'],
-          $this->_absoluteUrl
-        );
-        $rows[$rowNum]['civicrm_contact_organization_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_organization_name_hover'] = E::ts("View Contact Summary for this Contact.");
-        $entryFound = TRUE;
-      }
-      elseif (array_key_exists('civicrm_contact_nick_name', $row) &&
-        $rows[$rowNum]['civicrm_contact_nick_name'] &&
-        array_key_exists('civicrm_contact_id', $row)
-      ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
-          'reset=1&cid=' . $row['civicrm_contact_id'],
-          $this->_absoluteUrl
-        );
-        $rows[$rowNum]['civicrm_contact_nick_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_nick_name_hover'] = E::ts("View Contact Summary for this Contact.");
-        $entryFound = TRUE;
-      }
-
-      if (!$entryFound) {
-        break;
-      }
-    }
+    CRM_Cpreports_Utils::alterDisplayTeam($rows);
   }
 
   public function statistics(&$rows) {
+    return;
     $statistics = parent::statistics($rows);
     // Get an abbreviated form of the report SQL, and use it as the base for stats queries.
     $sqlBase = $this->_getSqlBase();
@@ -188,7 +103,7 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
         on td.entity_id = c.id
       where
         c.id in (
-          select {$this->_aliases['civicrm_contact']}.id $sqlBase
+          select {$this->_aliases['civicrm_contact_team']}.id $sqlBase
         )
       group by td.{$this->customFields_teamDetails['Team_Status']['column_name']}
 

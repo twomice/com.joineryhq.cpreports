@@ -15,6 +15,74 @@ use CRM_Cpreports_ExtensionUtil as E;
 class CRM_Cpreports_Utils {
 
   //put your code here
+  public static function getTeamColumns($teamLabel = 'Team') {
+    // Build a list of options for the nick_name select filter (all existing team nicknames)
+    $nickNameOptions = array();
+    $dao = CRM_Core_DAO::executeQuery('
+        SELECT DISTINCT nick_name
+      FROM civicrm_contact
+      WHERE
+        contact_type = "Organization"
+        AND contact_sub_type LIKE "%team%"
+        AND nick_name > ""
+      ORDER BY nick_name
+    ');
+    while ($dao->fetch()) {
+      $nickNameOptions[$dao->nick_name] = $dao->nick_name;
+    }
+
+    return array(
+      'civicrm_contact_team' => array(
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'fields' => array(
+          'organization_name' => array(
+            'title' => E::ts("$teamLabel Name"),
+            'required' => FALSE,
+            'default' => FALSE,
+            'grouping' => 'team-fields',
+          ),
+          'nick_name' => array(
+            'title' => E::ts("$teamLabel Nickname"),
+            'required' => FALSE,
+            'default' => FALSE,
+            'grouping' => 'team-fields',
+          ),
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+        ),
+        'filters' => array(
+          'organization_name' => array(
+            'title' => E::ts("$teamLabel Name"),
+            'operator' => 'like',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'nick_name_like' => array(
+            'title' => E::ts("$teamLabel Nickname"),
+            'dbAlias' => 'contact_team_civireport.nick_name',
+            'operator' => 'like',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'nick_name_select' => array(
+            'title' => E::ts("$teamLabel Nickname"),
+            'dbAlias' => 'contact_team_civireport.nick_name',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $nickNameOptions,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+        'order_bys' => array(
+          'organization_name' => array(
+            'title' => E::ts("$teamLabel Name"),
+          ),
+        ),
+        'grouping' => 'contact-fields',
+      ),
+    );
+  }
+
+  //put your code here
   public static function getAddressColumns() {
     return array(
       'civicrm_address' => array(
@@ -77,7 +145,43 @@ class CRM_Cpreports_Utils {
       ),
     );
   }
-  
+
+  public static function alterDisplayTeam(&$rows) {
+    // custom code to alter rows
+    $entryFound = FALSE;
+    foreach ($rows as $rowNum => $row) {
+      if (array_key_exists('civicrm_contact_team_organization_name', $row) &&
+        $rows[$rowNum]['civicrm_contact_team_organization_name'] &&
+        array_key_exists('civicrm_contact_team_id', $row)
+      ) {
+        $url = CRM_Utils_System::url("civicrm/contact/view",
+          'reset=1&cid=' . $row['civicrm_contact_team_id'],
+          TRUE
+        );
+        $rows[$rowNum]['civicrm_contact_team_organization_name_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_team_organization_name_hover'] = E::ts("View Contact Summary for this Contact.");
+        $entryFound = TRUE;
+      }
+
+      if (array_key_exists('civicrm_contact_team_nick_name', $row) &&
+        $rows[$rowNum]['civicrm_contact_team_nick_name'] &&
+        array_key_exists('civicrm_contact_team_id', $row)
+      ) {
+        $url = CRM_Utils_System::url("civicrm/contact/view",
+          'reset=1&cid=' . $row['civicrm_contact_team_id'],
+          TRUE
+        );
+        $rows[$rowNum]['civicrm_contact_team_nick_name_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_team_nick_name_hover'] = E::ts("View Contact Summary for this Contact.");
+        $entryFound = TRUE;
+      }
+
+      if (!$entryFound) {
+        break;
+      }
+    }
+  }
+
   public static function alterDisplayAddress(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -96,7 +200,7 @@ class CRM_Cpreports_Utils {
         }
         $entryFound = TRUE;
       }
-      
+
       if (!$entryFound) {
         break;
       }

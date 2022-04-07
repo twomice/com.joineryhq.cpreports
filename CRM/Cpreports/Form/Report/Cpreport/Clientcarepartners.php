@@ -18,20 +18,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
   protected $_tempTableName = 'TEMP_ClientCarepartners';
 
   public function __construct() {
-    // Build a list of options for the nick_name select filter (all existing team nicknames)
-    $nickNameOptions = array();
-    $dao = CRM_Core_DAO::executeQuery('
-      SELECT DISTINCT nick_name
-      FROM civicrm_contact
-      WHERE
-        contact_type = "Organization"
-        AND contact_sub_type LIKE "%team%"
-        AND nick_name > ""
-      ORDER BY nick_name
-    ');
-    while ($dao->fetch()) {
-      $nickNameOptions[$dao->nick_name] = $dao->nick_name;
-    }
 
     // Build a list of options for the diagnosis select filter (all diagnosis options)
     $customFieldId_diagnosis1 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_1', 'Health');
