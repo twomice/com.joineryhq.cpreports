@@ -223,18 +223,21 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
    */
   public function from() {
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+    // 'target' = 'with'
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $this->_aliases['civicrm_contact'] = $this->_aliases['civicrm_contact_assignee'];
 
     $this->_from = "
       FROM civicrm_activity {$this->_aliases['civicrm_activity']}
+      -- activity target = 'with' = 'serving team'
       INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']}_target
         ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}_target.activity_id AND
           {$this->_aliases['civicrm_activity_contact']}_target.record_type_id = {$targetID}
       INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact_team']}
         ON {$this->_aliases['civicrm_activity_contact']}_target.contact_id = {$this->_aliases['civicrm_contact_team']}.id
 
+      -- activity assignee = 'served individual'
       INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']}_assignee
         ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}_assignee.activity_id AND
           {$this->_aliases['civicrm_activity_contact']}_assignee.record_type_id = {$assigneeID}
@@ -527,7 +530,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
           $sqlBase
           having assignedteam_id IN (
-            select distinct civicrm_contact_team_civireport.id as serving_team_id
+            select distinct {$this->_aliases['civicrm_contact_team']}.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -547,7 +550,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
           $sqlBase
           having assignedteam_id IS NULL OR assignedteam_id NOT IN (
-            select distinct civicrm_contact_team_civireport.id as serving_team_id
+            select distinct {$this->_aliases['civicrm_contact_team']}.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -575,7 +578,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
             $sqlBase
           having assignedteam_id IN (
-            select distinct civicrm_contact_team_civireport.id as serving_team_id
+            select distinct {$this->_aliases['civicrm_contact_team']}.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -595,7 +598,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
             $sqlBase
           having assignedteam_id IS NULL OR assignedteam_id NOT IN (
-            select distinct civicrm_contact_team_civireport.id as serving_team_id
+            select distinct {$this->_aliases['civicrm_contact_team']}.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -623,7 +626,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
             $sqlBase
           having assignedteam_id IN (
-            select distinct civicrm_contact_team_civireport.id as serving_team_id
+            select distinct {$this->_aliases['civicrm_contact_team']}.id as serving_team_id
             $sqlBase
           )
         ) t
@@ -643,7 +646,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             civicrm_contact_assignedteam_civireport.id as assignedteam_id
             $sqlBase
           having assignedteam_id is null or assignedteam_id not IN (
-            select distinct civicrm_contact_team_civireport.id as serving_team_id
+            select distinct {$this->_aliases['civicrm_contact_team']}.id as serving_team_id
             $sqlBase
           )
         ) t
