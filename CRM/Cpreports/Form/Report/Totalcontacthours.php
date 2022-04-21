@@ -562,7 +562,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       );
 
       $distinctAssignedTeamsActivityCountQuery = "
-        select count(distinct client_id) from
+        select count(distinct base.activity_id) from
         (
           select distinct
             {$this->_aliases['civicrm_contact_assignee']}.id as client_id,
@@ -572,9 +572,14 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
             select distinct {$this->_aliases['civicrm_contact_team']}.id as serving_team_id
             $sqlBase
           )
-        ) t
+        ) client
+        INNER JOIN (
+          select
+          {$this->_aliases['civicrm_activity']}.id as activity_id,
+          {$this->_aliases['civicrm_contact_assignee']}.id as client_id
+          $sqlBase
+        ) base ON base.client_id = client.client_id
       ";
-
       $distinctAssignedTeamsActivityCount = CRM_Core_DAO::singleValueQuery($distinctAssignedTeamsActivityCountQuery);
       $statistics['counts']['distinctAssignedTeamsActivityCount'] = array(
         'title' => $indentPrefix . E::ts('Activities for contacts assigned to selected team(s)'),
