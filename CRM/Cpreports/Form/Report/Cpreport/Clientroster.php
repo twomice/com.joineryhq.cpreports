@@ -18,7 +18,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
    * @var Boolean. Whether or not to include relationship-dates-based "Days Participated" column
    */
   protected $_useColumnRelationshipDaysParticipatedAndDerivedStatistics;
-
   protected $_customGroupExtends = array('Individual', 'Contact');
   protected $_customGroupGroupBy = FALSE;
   protected $_customFields = array();
@@ -102,6 +101,14 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         ),
         'grouping' => 'contact-fields',
       ),
+      'civicrm_email' => array(
+        'fields' => array(
+          'email' =>
+          array(
+            'title' => 'Email Address',
+          ),
+        ),
+      )
     );
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -136,7 +143,6 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
         'default' => FALSE,
       ];
     }
-
   }
 
   public function from() {
@@ -168,6 +174,12 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
       $this->_from .= "
         LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
           ON {$this->_aliases['civicrm_address']}.is_primary AND {$this->_aliases['civicrm_address']}.contact_id = {$this->_aliases['civicrm_contact_indiv']}.id
+      ";
+    }
+    if ($this->isTableSelected('civicrm_email')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
+          ON {$this->_aliases['civicrm_email']}.is_primary AND {$this->_aliases['civicrm_email']}.contact_id = {$this->_aliases['civicrm_contact_indiv']}.id
       ";
     }
 
