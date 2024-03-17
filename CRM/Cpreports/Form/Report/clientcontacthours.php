@@ -17,6 +17,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
   protected $_selectAliasesTotal = array();
 
   protected $_customGroupExtends = array(
+    'Individual',
     'Activity',
   );
 
