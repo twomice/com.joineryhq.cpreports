@@ -14,75 +14,89 @@ use CRM_Cpreports_ExtensionUtil as E;
  */
 class CRM_Cpreports_Utils {
 
-  //put your code here
-  public static function getTeamColumns($teamLabel = 'Team') {
-    // Build a list of options for the nick_name select filter (all existing team nicknames)
-    $nickNameOptions = array();
-    $dao = CRM_Core_DAO::executeQuery('
-        SELECT DISTINCT nick_name
-      FROM civicrm_contact
-      WHERE
-        contact_type = "Organization"
-        AND contact_sub_type LIKE "%team%"
-        AND nick_name > ""
-      ORDER BY nick_name
-    ');
-    while ($dao->fetch()) {
-      $nickNameOptions[$dao->nick_name] = $dao->nick_name;
-    }
-
-    return array(
+  /**
+   * Return an array suitable for contatenating to a report's _columns property.
+   * (e.g. $this->_columns += CRM_Cpreports_Utils::getTeamColumns();
+   *
+   * @param String $teamLabel Prefix for team column and filter labels; default: 'Team'
+   * @param Array $options Which components should we add?
+   * @return Array
+   */
+  public static function getTeamColumns($teamLabel = NULL, $options = ['fields', 'filters', 'order_bys']) {
+    $teamLabel = $teamLabel ?? 'Team';
+    $ret = array(
       'civicrm_contact_team' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'organization_name' => array(
-            'title' => E::ts("$teamLabel Name"),
-            'required' => FALSE,
-            'default' => FALSE,
-            'grouping' => 'team-fields',
-          ),
-          'nick_name' => array(
-            'title' => E::ts("$teamLabel Nickname"),
-            'required' => FALSE,
-            'default' => FALSE,
-            'grouping' => 'team-fields',
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'organization_name' => array(
-            'title' => E::ts("$teamLabel Name"),
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'nick_name_like' => array(
-            'title' => E::ts("$teamLabel Nickname"),
-            'dbAlias' => 'contact_team_civireport.nick_name',
-            'operator' => 'like',
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'nick_name_select' => array(
-            'title' => E::ts("$teamLabel Nickname"),
-            'dbAlias' => 'contact_team_civireport.nick_name',
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $nickNameOptions,
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'order_bys' => array(
-          'organization_name' => array(
-            'title' => E::ts("$teamLabel Name"),
-          ),
-        ),
         'grouping' => 'contact-fields',
       ),
     );
+    if (in_array('fields', $options)) {
+      $ret['civicrm_contact_team']['fields'] = array(
+        'organization_name' => array(
+          'title' => E::ts("$teamLabel Name"),
+          'required' => FALSE,
+          'default' => FALSE,
+          'grouping' => 'team-fields',
+        ),
+        'nick_name' => array(
+          'title' => E::ts("$teamLabel Nickname"),
+          'required' => FALSE,
+          'default' => FALSE,
+          'grouping' => 'team-fields',
+        ),
+        'id' => array(
+          'no_display' => TRUE,
+          'required' => TRUE,
+        ),
+      );
+    }
+    if (in_array('filters', $options)) {
+      // Build a list of options for the nick_name select filter (all existing team nicknames)
+      $nickNameOptions = array();
+      $dao = CRM_Core_DAO::executeQuery('
+        SELECT DISTINCT nick_name
+        FROM civicrm_contact
+        WHERE
+          contact_type = "Organization"
+          AND contact_sub_type LIKE "%team%"
+          AND nick_name > ""
+        ORDER BY nick_name
+      ');
+      while ($dao->fetch()) {
+        $nickNameOptions[$dao->nick_name] = $dao->nick_name;
+      }
+      // Add filters.
+      $ret['civicrm_contact_team']['filters'] = array(
+        'organization_name' => array(
+          'title' => E::ts("$teamLabel Name"),
+          'operator' => 'like',
+          'type' => CRM_Utils_Type::T_STRING,
+        ),
+        'nick_name_like' => array(
+          'title' => E::ts("$teamLabel Nickname"),
+          'dbAlias' => 'contact_team_civireport.nick_name',
+          'operator' => 'like',
+          'type' => CRM_Utils_Type::T_STRING,
+        ),
+        'nick_name_select' => array(
+          'title' => E::ts("$teamLabel Nickname"),
+          'dbAlias' => 'contact_team_civireport.nick_name',
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => $nickNameOptions,
+          'type' => CRM_Utils_Type::T_STRING,
+        ),
+      );
+    }
+    if (in_array('order_bys', $options)) {
+      $ret['civicrm_contact_team']['order_bys'] = array(
+        'organization_name' => array(
+          'title' => E::ts("$teamLabel Name"),
+        ),
+      );
+    }
+    return $ret;
   }
 
-  //put your code here
   public static function getAddressColumns() {
     return array(
       'civicrm_address' => array(
