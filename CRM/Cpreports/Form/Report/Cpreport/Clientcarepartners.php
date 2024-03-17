@@ -114,7 +114,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     $this->_tagFilter = TRUE;
 
     $this->_columns += CRM_Cpreports_Utils::getAddressColumns();
-    $this->_columns += CRM_Cpreports_Utils::getTeamColumns(NULL, ['filters']);
+    $this->_columns += CRM_Cpreports_Utils::getTeamColumns('Assigned Team', ['filters']);
 
     parent::__construct();
     $this->_columns['alias_civicrm_value_participation_6']['alias'] = 'alias_civicrm_value_participation_6';
