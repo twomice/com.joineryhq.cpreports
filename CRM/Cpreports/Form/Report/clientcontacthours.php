@@ -88,7 +88,6 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
           'contact_assignee' => array(
             'name' => 'sort_name',
             'title' => E::ts('Assignee Name'),
-            'dbAlias' => "civicrm_contact_assignee_civireport.sort_name",
             'default' => TRUE,
           ),
           'contact_assignee_id' => array(
@@ -96,6 +95,18 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'contact_assignee_gender_id' => array(
+            'name' => 'gender_id',
+            'title' => E::ts('Assignee Gender'),
+          ),
+          'contact_assignee_birth_date' => array(
+            'name' => 'birth_date',
+            'title' => E::ts('Assignee Birth Date'),
+          ),
+          'contact_assignee_age' => [
+            'title' => ts('Assignee Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, civicrm_contact_assignee_civireport.birth_date, CURDATE())',
+          ],
         ),
         'filters' => array(
           'contact_assignee' => array(
@@ -195,9 +206,47 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
         'dao' => 'CRM_Activity_DAO_ActivityContact',
         'fields' => array(),
       ),
+      'civicrm_email' => array(
+        'dao' => 'CRM_Core_DAO_Email',
+        'fields' => array(
+          'email' => array(
+            'title' => ts('Assignee Email'),
+            'no_repeat' => TRUE,
+          ),
+        ),
+        'grouping' => 'contact-assignee-fields',
+        'order_bys' => array(
+          'email' => array(
+            'title' => ts('Email'),
+          ),
+        ),
+      ),
     );
 
     $this->_columns += CRM_Cpreports_Utils::getTeamColumns('Target (Team)');
+
+    // Add /some/ address fields and filters.
+    $addressCols = $this->getAddressColumns([
+      'group_bys' => FALSE,
+      'order_bys' => FALSE,
+      'prefix_label' => E::ts('Assignee Primary Address: '),
+    ])['civicrm_address'];
+    $addressColsIntersect = [
+      'filters' => [
+        'address_city' => 1,
+        'address_postal_code' => 1,
+      ],
+      'fields' => [
+        'address_street_address' => 1,
+        'address_supplemental_address_1' => 1,
+        'address_city' => 1,
+        'address_postal_code' => 1,
+        'address_state_province_id' => 1,
+      ],
+    ];
+    $addressCols['filters'] = array_intersect_key($addressCols['filters'], $addressColsIntersect['filters']);
+    $addressCols['fields'] = array_intersect_key($addressCols['fields'], $addressColsIntersect['fields']);
+    $this->_columns += ['civicrm_address' => $addressCols];
 
     parent::__construct();
   }
@@ -232,6 +281,9 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       {$this->_aclFrom}
       --  ^^ aclFrom ^^
     ";
+    $this->joinAddressFromContact();
+    $this->joinEmailFromContact();
+
   }
 
   public function storeWhereHavingClauseArray() {
@@ -379,6 +431,21 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
             $rows[$rowNum]['civicrm_contact_assignee_contact_assignee_link'] = $url;
             $rows[$rowNum]['civicrm_contact_assignee_contact_assignee_hover'] = $onHover;
           }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_email_email', $row)) {
+        if ($value = $row['civicrm_email_email']) {
+          $url = "mailto:{$value}";
+          $rows[$rowNum]['civicrm_email_email_link'] = $url;
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_contact_assignee_contact_assignee_gender_id', $row)) {
+        if ($value = $row['civicrm_contact_assignee_contact_assignee_gender_id']) {
+          $rows[$rowNum]['civicrm_contact_assignee_contact_assignee_gender_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', 'gender_id', $value);
           $entryFound = TRUE;
         }
       }
