@@ -154,12 +154,10 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
         LEFT JOIN (
           SELECT r.*
           FROM civicrm_relationship r
-            INNER JOIN civicrm_relationship_type rt
-              ON r.relationship_type_id = rt.id
-              AND rt.name_a_b = 'Has_team_client'
-        ) r ON r.contact_id_b  = {$this->_aliases['civicrm_contact_indiv']}.id
+          WHERE r.relationship_type_id = 18 -- has_team_client
+        ) rteam ON rteam.contact_id_b  = {$this->_aliases['civicrm_contact_indiv']}.id
         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact_team']}
-          ON {$this->_aliases['civicrm_contact_team']}.id = r.contact_id_a
+          ON {$this->_aliases['civicrm_contact_team']}.id = rteam.contact_id_a
       ";
     }
     $this->_addParticipationDatesFrom('civicrm_contact_indiv');
@@ -239,6 +237,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       $temporary = $this->_debug_temp_table($this->_tempTableName);
       // Create a single temp table to store flattened carepartner relationship data
       // for cient contacts that match report filters.
+      // This query creates an empty table.
       $query = "CREATE $temporary TABLE {$this->_tempTableName} (
         id int(10) unsigned NOT NULL AUTO_INCREMENT,
         client_contact_id int(10) unsigned NOT NULL,
@@ -253,14 +252,8 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       )";
       CRM_Core_DAO::executeQuery($query);
 
-      // Create a temporary copy of the temp table, so we can use it twice in
-      // the next query.
-      $temporary = $this->_debug_temp_table("{$this->_tempTableName}_copy1");
-      $query = "create $tempolorary table {$this->_tempTableName}_copy1 select * from {$this->_tempTableName}";
-      CRM_Core_DAO::executeQuery($query);
-      $this->addToDeveloperTab($query);
-
-      $query = "INSERT INTO {$this->_tempTableName}_copy1 (
+      // The actual temp table is empty. Insert relevant values.
+      $query = "INSERT INTO {$this->_tempTableName} (
           client_contact_id,
           carepartner_contact_id,
           carepartner_sort_name,
@@ -293,9 +286,15 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       CRM_Core_DAO::executeQuery($query);
       $this->addToDeveloperTab($query);
 
-      // Move all data from the temporary copy to the actual temp table, so it's correctly populated.
-      // the next query.
-      $query = "INSERT INTO {$this->_tempTableName} SELECT * FROM {$this->_tempTableName}_copy1";
+      // Create an empty copy of the temp table (so we can use it twice in
+      // the next query); we'll also copy the data immediately next.
+      $temporary = $this->_debug_temp_table("{$this->_tempTableName}_copy1");
+      $query = "create $temporary table {$this->_tempTableName}_copy1 like {$this->_tempTableName}";
+      CRM_Core_DAO::executeQuery($query);
+      $this->addToDeveloperTab($query);
+
+      // Now copy data into the temp "copy1" table.
+      $query = "insert into {$this->_tempTableName}_copy1 select * from {$this->_tempTableName}";
       CRM_Core_DAO::executeQuery($query);
       $this->addToDeveloperTab($query);
 
@@ -564,6 +563,14 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
       }
     }
     return $this->_relationshipTypeLabelOptions[$relationshipTypeKey];
+  }
+
+  protected function storeGroupByArray() {
+    // We should always show one row per individual client. Some joins may create duplicate
+    // rows (e.g. if we're including fields or filters from the 'contact team' table)
+    $this->_groupByArray['civicrm_contact_indiv_id'] = "{$this->_aliases['civicrm_contact_indiv']}.id";
+
+    parent::storeGroupByArray();
   }
 
 }
