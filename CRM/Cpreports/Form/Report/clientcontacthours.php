@@ -341,7 +341,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       // parent::sectionTotals() has already assigned values for section header
       // totals in the template. Fetch those from the template, and we'll alter
       // them below; the top-level header totals will be keyed to sort_name.
-      $totals = $this->getTemplate()->get_template_vars('sectionTotals');
+      $totals = $this->getTemplate()->getTemplateVars('sectionTotals');
       // build a query based on this report, with no LIMIT clause.
       $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy}";
       // Use that sql as a subquery, grouping by sort_name and suming duration.
