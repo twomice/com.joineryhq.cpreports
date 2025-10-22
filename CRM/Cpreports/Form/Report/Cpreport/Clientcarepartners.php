@@ -416,7 +416,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientcarepartners extends CRM_Cpreport
     if (!empty(array_intersect_key($rows[0], array_flip($carePartnerColumnNames)))) {
       $prevContactId = '';
       foreach ($rows as &$row) {
-        $cid = CRM_Utils_Array::value('civicrm_contact_indiv_id', $row);
+        $cid = $row['civicrm_contact_indiv_id'] ?? NULL;
         if ($cid == $prevContactId) {
           foreach (array_keys($row) as $key) {
             if (!in_array(

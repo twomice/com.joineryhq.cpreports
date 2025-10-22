@@ -567,7 +567,7 @@ class CRM_Cpreports_Form_Report_Cpreport extends CRM_Report_Form {
       // Get all the options for the Race field, so we can list them out.
       $allTextselectOptions = CRM_Textselect_Util::getAllFieldOptions();
       $raceOptions = [];
-      if ($raceTextselectOptions = CRM_Utils_Array::value($customFieldId_race, $allTextselectOptions)) {
+      if ($raceTextselectOptions = $allTextselectOptions[$customFieldId_race] ?? NULL) {
         foreach ($raceTextselectOptions as $raceTextselectOption) {
           $raceOptions[$raceTextselectOption['value']] = $raceTextselectOption['label'];
         }
