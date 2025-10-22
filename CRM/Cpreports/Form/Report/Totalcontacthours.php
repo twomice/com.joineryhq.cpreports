@@ -342,7 +342,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       // For each row, update the header totals for that sort_name.
       while ($dao->fetch()) {
         $sortName = $dao->civicrm_contact_assignee_sort_name;
-        if ($total = CRM_Utils_Array::value($sortName, $totals)) {
+        if ($total = $totals[$sortName] ?? NULL) {
           $total .= E::ts(" service records; total duration: %1", array(
             1 => $dao->ct,
           ));
