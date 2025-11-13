@@ -556,7 +556,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       // Section header
       $statistics['counts']['activity_sameteam_count_blank'] = array(
         'title' => E::ts('Activity counts per team assignment'),
-        'value' => E::ts(''),
+        'value' => '',
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
       );
