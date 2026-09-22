@@ -14,22 +14,22 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
 
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
 
-  protected $_selectAliasesTotal = array();
+  protected $_selectAliasesTotal = [];
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Individual',
     'Activity',
-  );
+  ];
 
   protected $_customGroupGroupBy = FALSE;
 
-  protected $_customFields = array();
+  protected $_customFields = [];
 
   /**
    * @var array
    * list of options for the activity_type_id filter.
    */
-  protected $activityTypeIdOptions = array();
+  protected $activityTypeIdOptions = [];
 
   /**
    * This report has not been optimised for group filtering.
@@ -70,158 +70,158 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     $customFieldId_diagnosis3 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_3', 'Health');
     $diagnosisOptions = CRM_Core_BAO_CustomField::buildOptions('custom_' . $customFieldId_diagnosis1);
 
-    $this->_customFields['diagnosis1'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis1));
-    $this->_customFields['diagnosis2'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis2));
-    $this->_customFields['diagnosis3'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis3));
+    $this->_customFields['diagnosis1'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis1]);
+    $this->_customFields['diagnosis2'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis2]);
+    $this->_customFields['diagnosis3'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis3]);
 
     // @todo split the 3 different contact tables into their own array items.
     // this will massively simplify the needs of this report.
-    $this->_columns = array(
-      'civicrm_contact_assignee' => array(
+    $this->_columns = [
+      'civicrm_contact_assignee' => [
         'dao' => 'CRM_Contact_DAO_Contact',
         'alias' => 'civicrm_contact_assignee',
-        'fields' => array(
-          'contact_assignee_id_display' => array(
+        'fields' => [
+          'contact_assignee_id_display' => [
             'name' => 'id',
             'title' => E::ts('Assignee ID'),
-          ),
-          'contact_assignee' => array(
+          ],
+          'contact_assignee' => [
             'name' => 'sort_name',
             'title' => E::ts('Assignee Name'),
             'default' => TRUE,
-          ),
-          'contact_assignee_id' => array(
+          ],
+          'contact_assignee_id' => [
             'name' => 'id',
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'contact_assignee_gender_id' => array(
+          ],
+          'contact_assignee_gender_id' => [
             'name' => 'gender_id',
             'title' => E::ts('Assignee Gender'),
-          ),
-          'contact_assignee_birth_date' => array(
+          ],
+          'contact_assignee_birth_date' => [
             'name' => 'birth_date',
             'title' => E::ts('Assignee Birth Date'),
-          ),
+          ],
           'contact_assignee_age' => [
             'title' => ts('Assignee Age'),
             'dbAlias' => 'TIMESTAMPDIFF(YEAR, civicrm_contact_assignee_civireport.birth_date, CURDATE())',
           ],
-        ),
-        'filters' => array(
-          'contact_assignee' => array(
+        ],
+        'filters' => [
+          'contact_assignee' => [
             'name' => 'sort_name',
             'title' => E::ts('Assignee Name'),
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
-          ),
-          'diagnosis' => array(
+          ],
+          'diagnosis' => [
             'title' => E::ts('Diagnosis 1, 2 or 3'),
             'pseudofield' => TRUE,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $diagnosisOptions,
             'type' => CRM_Utils_Type::T_STRING,
             'dbAlias' => "ARTIFICIALLY MANUFACTURED IN self::storeWhereHavingClauseArray()",
-          ),
-        ),
-        'order_bys' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'order_bys' => [
+          'sort_name' => [
             'title' => E::ts('Assignee Name'),
             'default_weight' => '1',
             'default_is_section' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-assignee-fields',
-      ),
-      'civicrm_activity' => array(
+      ],
+      'civicrm_activity' => [
         'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'no_display' => TRUE,
             'title' => E::ts('Activity ID'),
             'required' => TRUE,
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => E::ts('Activity Type'),
-          ),
-          'activity_subject' => array(
+          ],
+          'activity_subject' => [
             'title' => E::ts('Subject'),
             'default' => TRUE,
-          ),
-          'activity_date_time' => array(
+          ],
+          'activity_date_time' => [
             'title' => E::ts('Activity Date'),
             'default' => TRUE,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => E::ts('Activity Status'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'duration' => array(
+          ],
+          'duration' => [
             'title' => E::ts('Duration'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_INT,
-          ),
-          'location' => array(
+          ],
+          'location' => [
             'title' => E::ts('Location'),
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'details' => array(
+          ],
+          'details' => [
             'title' => E::ts('Activity Details'),
-          ),
-          'priority_id' => array(
+          ],
+          'priority_id' => [
             'title' => E::ts('Priority'),
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'filters' => array(
-          'activity_date_time' => array(
+          ],
+        ],
+        'filters' => [
+          'activity_date_time' => [
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'activity_subject' => array('title' => E::ts('Activity Subject')),
-          'status_id' => array(
+          ],
+          'activity_subject' => ['title' => E::ts('Activity Subject')],
+          'status_id' => [
             'title' => E::ts('Activity Status'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityStatus(),
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => E::ts('Activity Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->activityTypeIdOptions,
-          ),
-        ),
-        'order_bys' => array(
-          'activity_date_time' => array(
+          ],
+        ],
+        'order_bys' => [
+          'activity_date_time' => [
             'title' => E::ts('Activity Date'),
             'dbAlias' => 'civicrm_activity_activity_date_time',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
         'alias' => 'activity',
-      ),
+      ],
       // Hack to get $this->_alias populated for the table.
-      'civicrm_activity_contact' => array(
+      'civicrm_activity_contact' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(),
-      ),
-      'civicrm_email' => array(
+        'fields' => [],
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'email' => array(
+        'fields' => [
+          'email' => [
             'title' => ts('Assignee Email'),
             'no_repeat' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-assignee-fields',
-        'order_bys' => array(
-          'email' => array(
+        'order_bys' => [
+          'email' => [
             'title' => ts('Email'),
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
 
     $this->_columns += CRM_Cpreports_Utils::getTeamColumns('Target (Team)');
 
@@ -293,7 +293,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
 
     if ($this->_params['diagnosis_value']) {
       // Apply "any diagnosis" filter
-      $diagnosisOrWheres = array();
+      $diagnosisOrWheres = [];
       // Define fields for diagnosis 1, 2, and 3, each as a copy of the 'diagnosis' filter
       // field; then manually alter the 'dbAlias' property to use the relevant
       // custom field column.
@@ -351,9 +351,9 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       while ($dao->fetch()) {
         $sortName = $dao->civicrm_contact_assignee_sort_name;
         if ($total = $totals[$sortName] ?? NULL) {
-          $total .= E::ts(" service records; total duration: %1", array(
+          $total .= E::ts(" service records; total duration: %1", [
             1 => $dao->ct,
-          ));
+          ]);
           $totals[$sortName] = $total;
         }
       }
@@ -384,7 +384,7 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
     $contactID = CRM_Utils_Type::escape($contactID, 'Integer');
 
     CRM_Contact_BAO_Contact_Permission::cache($contactID);
-    $clauses = array();
+    $clauses = [];
     foreach ($tableAlias as $k => $alias) {
       $clauses[] = " INNER JOIN civicrm_acl_contact_cache aclContactCache_{$k} ON ( {$alias}.id = aclContactCache_{$k}.contact_id OR {$alias}.id IS NULL ) AND aclContactCache_{$k}.user_id = $contactID ";
     }
@@ -501,20 +501,20 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
         select civicrm_contact_assignee_civireport.id $sqlBase
       ) t
     ";
-    $statistics['counts']['contact_count_total'] = array(
+    $statistics['counts']['contact_count_total'] = [
       'title' => E::ts('Total distinct contacts'),
       'value' => CRM_Core_DAO::singleValueQuery($distinctContactCountQuery),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     // Section header
-    $statistics['counts']['contact_count_blank'] = array(
+    $statistics['counts']['contact_count_blank'] = [
       'title' => E::ts('Distinct contacts per activity type'),
       'value' => '',
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_STRING,
-    );
+    ];
 
     $indentPrefix = '&nbsp; &nbsp; ';
 
@@ -526,15 +526,15 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
         ) t
         where t.activity_type_id = %1
       ";
-      $activityTypeCountParams = array(
-        '1' => array($activityTypeId, 'Int'),
-      );
-      $statistics['counts']['contact_count_' . $activityTypeId] = array(
+      $activityTypeCountParams = [
+        '1' => [$activityTypeId, 'Int'],
+      ];
+      $statistics['counts']['contact_count_' . $activityTypeId] = [
         'title' => $indentPrefix . $activityTypeLabel,
         'value' => CRM_Core_DAO::singleValueQuery($activityTypeCountQuery, $activityTypeCountParams),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
     }
 
     $totalMinutesQuery = "
@@ -544,12 +544,12 @@ class CRM_Cpreports_Form_Report_clientcontacthours extends CRM_Report_Form {
       ) t
     ";
 
-    $statistics['counts']['total_duration'] = array(
+    $statistics['counts']['total_duration'] = [
       'title' => E::ts("Total duration"),
       'value' => CRM_Core_DAO::singleValueQuery($totalMinutesQuery),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     return $statistics;
   }

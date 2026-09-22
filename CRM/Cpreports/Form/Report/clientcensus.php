@@ -5,87 +5,87 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
 
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
 
-  protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
+  protected $_customGroupExtends = ['Individual', 'Contact', 'Relationship'];
 
-  protected $customGroup_clientParticipation = array();
-  protected $customField_dispositionDate = array();
+  protected $customGroup_clientParticipation = [];
+  protected $customField_dispositionDate = [];
 
   protected $_customGroupGroupBy = FALSE;
 
   public function __construct() {
     // Get metadata for Team_details custom field group, and for 'Team status'
     // custom field in that group.
-    $this->customGroup_clientParticipation = civicrm_api3('customGroup', 'getSingle', array(
+    $this->customGroup_clientParticipation = civicrm_api3('customGroup', 'getSingle', [
       'name' => 'Participation',
-    ));
-    $this->customField_dispositionDate = civicrm_api3('customField', 'getSingle', array(
+    ]);
+    $this->customField_dispositionDate = civicrm_api3('customField', 'getSingle', [
       'custom_group_id' => $this->customGroup_clientParticipation['id'],
       'name' => 'Disposition_Date',
-    ));
+    ]);
 
-    $this->_columns = array(
-      'civicrm_contact_indiv' => array(
+    $this->_columns = [
+      'civicrm_contact_indiv' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
             'required' => TRUE,
             'default' => TRUE,
-          ),
-          'contact_id' => array(
+          ],
+          'contact_id' => [
             'title' => E::ts('Contact ID'),
             'name' => 'id',
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => E::ts('First Name'),
-          ),
-          'last_name' => array(
+          ],
+          'last_name' => [
             'title' => E::ts('Last Name'),
-          ),
-          'middle_name' => array(
+          ],
+          'middle_name' => [
             'title' => E::ts('Middle Name'),
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'title' => E::ts('Gender'),
-          ),
-          'prefix_id' => array(
+          ],
+          'prefix_id' => [
             'title' => E::ts('Prefix'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'title' => E::ts('Date of Birth'),
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
             'operator' => 'like',
-          ),
-        ),
-        'order_bys' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'order_bys' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_email' => array(
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array('email' => NULL),
+        'fields' => ['email' => NULL],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_phone' => array(
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => array(
-          'phone' => array(
+        'fields' => [
+          'phone' => [
             'dbAlias'  => "GROUP_CONCAT(DISTINCT CONCAT(lt.display_name, ' ', pt.label, ': ', phone_civireport.phone) ORDER BY phone_civireport.is_primary DESC SEPARATOR'<br \>')",
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
+      ],
     //      'custom_client_participation' => array(
     //        'alias' => $this->customGroup_clientParticipation['table_name'],
     //        'fields' => array(
@@ -103,31 +103,31 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
     //        ),
     //        'grouping' => 'team-fields',
     //      ),
-      'civicrm_relationship' => array(
-        'fields' => array(
-          'start_date' => array(
+      'civicrm_relationship' => [
+        'fields' => [
+          'start_date' => [
             'title' => E::ts('Start Date'),
             'default' => TRUE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => E::ts('End Date'),
-          ),
-        ),
-        'filters' => array(
-          'is_active' => array(
+          ],
+        ],
+        'filters' => [
+          'is_active' => [
             'title' => ts('Relationship Status'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array(
+            'options' => [
               '' => ts('- Any -'),
               1 => ts('Active'),
               0 => ts('Inactive'),
-            ),
+            ],
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'relationship-fields',
-      ),
-    );
+      ],
+    ];
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -253,12 +253,12 @@ class CRM_Cpreports_Form_Report_clientcensus extends CRM_Report_Form {
     $sql = "select {$this->_aliases['civicrm_contact_indiv']}.id {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having}";
     $indivCount = CRM_Core_DAO::singleValueQuery("select count(distinct t.id) as cnt from ($sql) t");
 
-    $statistics['counts']['individuals'] = array(
+    $statistics['counts']['individuals'] = [
       'title' => E::ts("Total Client(s)"),
       'value' => $indivCount,
       // e.g. CRM_Utils_Type::T_STRING, defaul.t seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
     return $statistics;
   }
 

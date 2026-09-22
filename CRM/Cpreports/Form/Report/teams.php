@@ -4,7 +4,7 @@ use CRM_Cpreports_ExtensionUtil as E;
 class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
 
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
-  protected $_customGroupExtends = array('Organization', 'Contact');
+  protected $_customGroupExtends = ['Organization', 'Contact'];
   protected $_customGroupGroupBy = FALSE;
 
   protected $customGroup_teamDetails;
@@ -13,17 +13,17 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
   public function __construct() {
     // Get metadata for Team_details custom field group, and for 'Team status'
     // custom field in that group.
-    $this->customGroup_teamDetails = civicrm_api3('customGroup', 'getSingle', array(
+    $this->customGroup_teamDetails = civicrm_api3('customGroup', 'getSingle', [
       'name' => 'Team_details',
-    ));
-    $customFieldsGet = civicrm_api3('customField', 'get', array(
+    ]);
+    $customFieldsGet = civicrm_api3('customField', 'get', [
       'custom_group_id' => $this->customGroup_teamDetails['id'],
-    ));
+    ]);
     $this->customFields_teamDetails = CRM_Utils_Array::rekey($customFieldsGet['values'], 'name');
 
-    $this->_columns = array(
-      'civicrm_contact' => array(),
-    );
+    $this->_columns = [
+      'civicrm_contact' => [],
+    ];
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -33,11 +33,11 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
 
     // Set some custom fields for default display.
     $teamDetailsFields =& $this->_columns[$this->customGroup_teamDetails['table_name']]['fields'];
-    $defaultFieldNames = array(
+    $defaultFieldNames = [
       'Beginning_Date',
       'Ending_Date',
       'Team_Status',
-    );
+    ];
     foreach ($defaultFieldNames as $defaultFieldName) {
       $fieldId = $this->customFields_teamDetails[$defaultFieldName]['id'];
       $teamDetailsFields["custom_{$fieldId}"]['default'] = TRUE;
@@ -88,10 +88,10 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
     $statusValuesDao = CRM_Core_DAO::executeQuery($statusValuesQuery);
     $statusStats = [];
     while ($statusValuesDao->fetch()) {
-      $statusStats[$statusValuesDao->value] = array(
+      $statusStats[$statusValuesDao->value] = [
         'count' => 0,
         'label' => $statusValuesDao->label,
-      );
+      ];
     }
 
     // Get a per-team-status count statistic across report results.
@@ -114,12 +114,12 @@ class CRM_Cpreports_Form_Report_teams extends CRM_Report_Form {
     }
 
     foreach ($statusStats as $statusKey => $statusStat) {
-      $statistics['counts']['status_' . $statusKey] = array(
-        'title' => E::ts("Team status is '%1'", array(1 => $statusStat['label'])),
+      $statistics['counts']['status_' . $statusKey] = [
+        'title' => E::ts("Team status is '%1'", [1 => $statusStat['label']]),
         'value' => $statusStat['count'],
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
     }
     return $statistics;
   }

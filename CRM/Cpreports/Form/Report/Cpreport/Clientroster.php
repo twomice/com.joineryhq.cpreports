@@ -18,9 +18,9 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
    * @var Boolean. Whether or not to include relationship-dates-based "Days Participated" column
    */
   protected $_useColumnRelationshipDaysParticipatedAndDerivedStatistics;
-  protected $_customGroupExtends = array('Individual', 'Contact');
+  protected $_customGroupExtends = ['Individual', 'Contact'];
   protected $_customGroupGroupBy = FALSE;
-  protected $_customFields = array();
+  protected $_customFields = [];
 
   public function __construct() {
 
@@ -30,86 +30,86 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
     $customFieldId_diagnosis3 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_3', 'Health');
     $diagnosisOptions = CRM_Core_BAO_CustomField::buildOptions('custom_' . $customFieldId_diagnosis1);
 
-    $this->_customFields['diagnosis1'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis1));
-    $this->_customFields['diagnosis2'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis2));
-    $this->_customFields['diagnosis3'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis3));
+    $this->_customFields['diagnosis1'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis1]);
+    $this->_customFields['diagnosis2'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis2]);
+    $this->_customFields['diagnosis3'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis3]);
 
-    $this->_columns = array(
-      'civicrm_contact_indiv' => array(
+    $this->_columns = [
+      'civicrm_contact_indiv' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
             'required' => TRUE,
             'default' => TRUE,
             'no_repeat' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'contact_id' => array(
+          ],
+          'contact_id' => [
             'title' => E::ts('Contact ID'),
             'name' => 'id',
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => E::ts('First Name'),
-          ),
-          'last_name' => array(
+          ],
+          'last_name' => [
             'title' => E::ts('Last Name'),
-          ),
-          'middle_name' => array(
+          ],
+          'middle_name' => [
             'title' => E::ts('Middle Name'),
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'title' => E::ts('Gender'),
-          ),
-          'prefix_id' => array(
+          ],
+          'prefix_id' => [
             'title' => E::ts('Prefix'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'title' => E::ts('Date of Birth'),
-          ),
-          'age' => array(
+          ],
+          'age' => [
             'title' => E::ts('Age'),
             'dbAlias' => "TIMESTAMPDIFF(YEAR, contact_indiv_civireport.birth_date, CURDATE())",
             'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
             'operator' => 'like',
-          ),
-          'diagnosis' => array(
+          ],
+          'diagnosis' => [
             'title' => E::ts('Diagnosis 1, 2 or 3'),
             'pseudofield' => TRUE,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $diagnosisOptions,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'age' => array(
+          ],
+          'age' => [
             'title' => E::ts('Age'),
             'dbAlias' => "TIMESTAMPDIFF(YEAR, contact_indiv_civireport.birth_date, CURDATE())",
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-        'order_bys' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'order_bys' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_email' => array(
-        'fields' => array(
+      ],
+      'civicrm_email' => [
+        'fields' => [
           'email' =>
-          array(
+          [
             'title' => 'Email Address',
-          ),
-        ),
-      )
-    );
+          ],
+        ],
+      ]
+    ];
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -212,7 +212,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
 
     if ($this->_params['diagnosis_value']) {
       // Apply "any diagnosis" filter
-      $diagnosisOrWheres = array();
+      $diagnosisOrWheres = [];
       // Define fields for diagnosis 1, 2, and 3, each as a copy of the 'diagnosis' filter
       // field; then manually alter the 'dbAlias' property to use the relevant
       // custom field column.
@@ -323,12 +323,12 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster extends CRM_Cpreports_Form
             AND r.relationship_type_id = 18
       {$where}
     ";
-    $statistics['counts']['participation_ended_during'] = array(
+    $statistics['counts']['participation_ended_during'] = [
       'title' => E::ts("{$titlePrefix}Clients with relationships ending during analysis period"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
   }
 
 }

@@ -14,21 +14,21 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
 
   protected $_autoIncludeIndexedFieldsAsOrderBys = 1;
 
-  protected $_selectAliasesTotal = array();
+  protected $_selectAliasesTotal = [];
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Activity',
-  );
+  ];
 
   protected $_customGroupGroupBy = FALSE;
 
-  protected $_customFields = array();
+  protected $_customFields = [];
 
   /**
    * @var array
    * list of options for the activity_type_id filter.
    */
-  protected $activityTypeIdOptions = array();
+  protected $activityTypeIdOptions = [];
 
   /**
    * @var array
@@ -75,143 +75,143 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
     $customFieldId_diagnosis3 = CRM_Core_BAO_CustomField::getCustomFieldID('Diagnosis_3', 'Health');
     $diagnosisOptions = CRM_Core_BAO_CustomField::buildOptions('custom_' . $customFieldId_diagnosis1);
 
-    $this->_customFields['diagnosis1'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis1));
-    $this->_customFields['diagnosis2'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis2));
-    $this->_customFields['diagnosis3'] = civicrm_api3('customField', 'getSingle', array('id' => $customFieldId_diagnosis3));
+    $this->_customFields['diagnosis1'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis1]);
+    $this->_customFields['diagnosis2'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis2]);
+    $this->_customFields['diagnosis3'] = civicrm_api3('customField', 'getSingle', ['id' => $customFieldId_diagnosis3]);
 
     // @todo split the 3 different contact tables into their own array items.
     // this will massively simplify the needs of this report.
-    $this->_columns = array(
-      'civicrm_contact_assignee' => array(
+    $this->_columns = [
+      'civicrm_contact_assignee' => [
         'dao' => 'CRM_Contact_DAO_Contact',
         'alias' => 'civicrm_contact_assignee',
-        'fields' => array(
-          'contact_assignee_id_display' => array(
+        'fields' => [
+          'contact_assignee_id_display' => [
             'name' => 'id',
             'title' => E::ts('Assignee ID'),
-          ),
-          'contact_assignee' => array(
+          ],
+          'contact_assignee' => [
             'name' => 'sort_name',
             'title' => E::ts('Assignee Name'),
             'dbAlias' => "civicrm_contact_assignee_civireport.sort_name",
             'default' => TRUE,
-          ),
-          'contact_assignee_id' => array(
+          ],
+          'contact_assignee_id' => [
             'name' => 'id',
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'contact_assignee' => array(
+          ],
+        ],
+        'filters' => [
+          'contact_assignee' => [
             'name' => 'sort_name',
             'title' => E::ts('Assignee Name'),
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
-          ),
-          'diagnosis' => array(
+          ],
+          'diagnosis' => [
             'title' => E::ts('Diagnosis 1, 2 or 3'),
             'pseudofield' => TRUE,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $diagnosisOptions,
             'type' => CRM_Utils_Type::T_STRING,
             'dbAlias' => "ARTIFICIALLY MANUFACTURED IN self::storeWhereHavingClauseArray()",
-          ),
-        ),
-        'order_bys' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'order_bys' => [
+          'sort_name' => [
             'title' => E::ts('Assignee Name'),
             'default_weight' => '1',
             'default_is_section' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-assignee-fields',
-      ),
-      'civicrm_contact_assignedteam' => array(
+      ],
+      'civicrm_contact_assignedteam' => [
         'dao' => 'CRM_Contact_DAO_Contact',
         'alias' => 'civicrm_contact_assignedteam',
-        'fields' => array(
-          'assigned_team_ids' => array(
+        'fields' => [
+          'assigned_team_ids' => [
             'title' => E::ts('Assigned Team(s)'),
             'dbAlias' => 'GROUP_CONCAT(civicrm_contact_assignedteam_civireport.id)',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_activity' => array(
+      ],
+      'civicrm_activity' => [
         'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'no_display' => TRUE,
             'title' => E::ts('Activity ID'),
             'required' => TRUE,
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => E::ts('Activity Type'),
-          ),
-          'activity_subject' => array(
+          ],
+          'activity_subject' => [
             'title' => E::ts('Subject'),
             'default' => TRUE,
-          ),
-          'activity_date_time' => array(
+          ],
+          'activity_date_time' => [
             'title' => E::ts('Activity Date'),
             'default' => TRUE,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => E::ts('Activity Status'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'duration' => array(
+          ],
+          'duration' => [
             'title' => E::ts('Duration'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_INT,
-          ),
-          'location' => array(
+          ],
+          'location' => [
             'title' => E::ts('Location'),
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'details' => array(
+          ],
+          'details' => [
             'title' => E::ts('Activity Details'),
-          ),
-          'priority_id' => array(
+          ],
+          'priority_id' => [
             'title' => E::ts('Priority'),
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'filters' => array(
-          'activity_date_time' => array(
+          ],
+        ],
+        'filters' => [
+          'activity_date_time' => [
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'activity_subject' => array('title' => E::ts('Activity Subject')),
-          'status_id' => array(
+          ],
+          'activity_subject' => ['title' => E::ts('Activity Subject')],
+          'status_id' => [
             'title' => E::ts('Activity Status'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityStatus(),
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => E::ts('Activity Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->activityTypeIdOptions,
-          ),
-        ),
-        'order_bys' => array(
-          'activity_date_time' => array(
+          ],
+        ],
+        'order_bys' => [
+          'activity_date_time' => [
             'title' => E::ts('Activity Date'),
             'dbAlias' => 'civicrm_activity_activity_date_time',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
         'alias' => 'activity',
-      ),
+      ],
       // Hack to get $this->_alias populated for the table.
-      'civicrm_activity_contact' => array(
+      'civicrm_activity_contact' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(),
-      ),
-    );
+        'fields' => [],
+      ],
+    ];
     $this->_columns += CRM_Cpreports_Utils::getTeamColumns('Target (Serving Team)');
 
     parent::__construct();
@@ -285,7 +285,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
 
     if ($this->_params['diagnosis_value']) {
       // Apply "any diagnosis" filter
-      $diagnosisOrWheres = array();
+      $diagnosisOrWheres = [];
       // Define fields for diagnosis 1, 2, and 3, each as a copy of the 'diagnosis' filter
       // field; then manually alter the 'dbAlias' property to use the relevant
       // custom field column.
@@ -343,9 +343,9 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       while ($dao->fetch()) {
         $sortName = $dao->civicrm_contact_assignee_sort_name;
         if ($total = $totals[$sortName] ?? NULL) {
-          $total .= E::ts(" service records; total duration: %1", array(
+          $total .= E::ts(" service records; total duration: %1", [
             1 => $dao->ct,
-          ));
+          ]);
           $totals[$sortName] = $total;
         }
       }
@@ -376,7 +376,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
     $contactID = CRM_Utils_Type::escape($contactID, 'Integer');
 
     CRM_Contact_BAO_Contact_Permission::cache($contactID);
-    $clauses = array();
+    $clauses = [];
     foreach ($tableAlias as $k => $alias) {
       $clauses[] = " INNER JOIN civicrm_acl_contact_cache aclContactCache_{$k} ON ( {$alias}.id = aclContactCache_{$k}.contact_id OR {$alias}.id IS NULL ) AND aclContactCache_{$k}.user_id = $contactID ";
     }
@@ -495,12 +495,12 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       ) t
     ";
     $contactCountTotal = CRM_Core_DAO::singleValueQuery($distinctContactCountQuery);
-    $statistics['counts']['contact_count_total'] = array(
+    $statistics['counts']['contact_count_total'] = [
       'title' => E::ts('Total distinct contacts'),
       'value' => $contactCountTotal,
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     $totalMinutesQuery = "
       select sum(t.duration)
@@ -509,22 +509,22 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       ) t
     ";
     $totalMinutes = CRM_Core_DAO::singleValueQuery($totalMinutesQuery);
-    $statistics['counts']['total_duration'] = array(
+    $statistics['counts']['total_duration'] = [
       'title' => E::ts("Total duration"),
       'value' => $totalMinutes,
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     // Show 'same team' stats, only if 'Assigned Team(s)' field is displayed.
     if (isset($this->_params['fields']["assigned_team_ids"])) {
       // Section header
-      $statistics['counts']['contact_sameteam_count_blank'] = array(
+      $statistics['counts']['contact_sameteam_count_blank'] = [
         'title' => E::ts('Contact counts per team assignment'),
         'value' => '',
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
       $distinctAssignedTeamsContactCountQuery = "
         select count(*) from
         (
@@ -539,27 +539,27 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ) t
       ";
       $distinctAssignedTeamsContactCount = CRM_Core_DAO::singleValueQuery($distinctAssignedTeamsContactCountQuery);
-      $statistics['counts']['distinctAssignedTeamsContactCount'] = array(
+      $statistics['counts']['distinctAssignedTeamsContactCount'] = [
         'title' => $indentPrefix . E::ts('Contacts assigned to selected team(s)'),
         'value' => $distinctAssignedTeamsContactCount,
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
 
-      $statistics['counts']['distinctNotAssignedTeamsContactCount'] = array(
+      $statistics['counts']['distinctNotAssignedTeamsContactCount'] = [
         'title' => $indentPrefix . E::ts('Contacts not assigned to selected team(s)'),
         'value' => ($contactCountTotal - $distinctAssignedTeamsContactCount),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
 
       // Section header
-      $statistics['counts']['activity_sameteam_count_blank'] = array(
+      $statistics['counts']['activity_sameteam_count_blank'] = [
         'title' => E::ts('Activity counts per team assignment'),
         'value' => '',
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
 
       $distinctAssignedTeamsActivityCountQuery = "
         select count(distinct base.activity_id) from
@@ -581,27 +581,27 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         ) base ON base.client_id = client.client_id
       ";
       $distinctAssignedTeamsActivityCount = CRM_Core_DAO::singleValueQuery($distinctAssignedTeamsActivityCountQuery);
-      $statistics['counts']['distinctAssignedTeamsActivityCount'] = array(
+      $statistics['counts']['distinctAssignedTeamsActivityCount'] = [
         'title' => $indentPrefix . E::ts('Activities for contacts assigned to selected team(s)'),
         'value' => $distinctAssignedTeamsActivityCount,
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
 
-      $statistics['counts']['distinctNotAssignedTeamsActivityCount'] = array(
+      $statistics['counts']['distinctNotAssignedTeamsActivityCount'] = [
         'title' => $indentPrefix . E::ts('Activities for contacts not assigned to selected team(s)'),
         'value' => ($countDistinctActivities - $distinctAssignedTeamsActivityCount),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
 
       // Section header
-      $statistics['counts']['duration_sameteam_count_blank'] = array(
+      $statistics['counts']['duration_sameteam_count_blank'] = [
         'title' => E::ts('Total duration per team assignment'),
         'value' => '',
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
 
       $distinctAssignedTeamsDurationQuery = "
         SELECT SUM(base.duration)
@@ -623,43 +623,43 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       ";
       $distinctAssignedTeamsDuration = CRM_Core_DAO::singleValueQuery($distinctAssignedTeamsDurationQuery);
 
-      $statistics['counts']['distinctAssignedTeamsDuration'] = array(
+      $statistics['counts']['distinctAssignedTeamsDuration'] = [
         'title' => $indentPrefix . E::ts('Total duration for contacts assigned to selected team(s)'),
         'value' => $distinctAssignedTeamsDuration,
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
 
-      $statistics['counts']['distinctNotAssignedTeamsDuration'] = array(
+      $statistics['counts']['distinctNotAssignedTeamsDuration'] = [
         'title' => $indentPrefix . E::ts('Total duration for contacts not assigned to selected team(s)'),
         'value' => ($totalMinutes - $distinctAssignedTeamsDuration),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
 
     }
     else {
       // Section header
-      $statistics['counts']['contact_sameteam_count_blank'] = array(
+      $statistics['counts']['contact_sameteam_count_blank'] = [
         'title' => E::ts('Contact counts per team assignment'),
         'value' => E::ts('(Please enable the "Assigned Team(s)" column to reveal these statistics.)'),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
       // Section header
-      $statistics['counts']['activity_sameteam_count_blank'] = array(
+      $statistics['counts']['activity_sameteam_count_blank'] = [
         'title' => E::ts('Activity counts per team assignment'),
         'value' => E::ts('(Please enable the "Assigned Team(s)" column to reveal these statistics.)'),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
       // Section header
-      $statistics['counts']['duration_sameteam_count_blank'] = array(
+      $statistics['counts']['duration_sameteam_count_blank'] = [
         'title' => E::ts('Total duration per team assignment'),
         'value' => E::ts('(Please enable the "Assigned Team(s)" column to reveal these statistics.)'),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
     }
 
     // Show help-type stats, only if 'Help Type' field is displayed.
@@ -677,12 +677,12 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       $helpTypeCustomFieldColumnName = $customField_helpType['column_name'];
 
       // Section header
-      $statistics['counts']['helptype_count_blank'] = array(
+      $statistics['counts']['helptype_count_blank'] = [
         'title' => E::ts('Activity counts per Help Type'),
         'value' => '',
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
 
       $helpTypeCountsQuery = "
         SELECT COUNT(*) AS cnt, t.helptype
@@ -694,20 +694,20 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       $dao = CRM_Core_DAO::executeQuery($helpTypeCountsQuery);
       $i = 0;
       while ($dao->fetch()) {
-        $statistics['counts']['helptype_count_' . $i++] = array(
+        $statistics['counts']['helptype_count_' . $i++] = [
           'title' => $indentPrefix . CRM_Utils_Array::value($dao->helptype, $helpTypeLabels, '[NONE SPECIFIED]'),
           'value' => $dao->cnt,
           // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
           'type' => CRM_Utils_Type::T_INT,
-        );
+        ];
       }
 
-      $statistics['counts']['helptype_duration_blank'] = array(
+      $statistics['counts']['helptype_duration_blank'] = [
         'title' => E::ts('Total duration per Help Type'),
         'value' => '',
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
 
       $helpTypeDurationQuery = "
         SELECT sum(t.duration) as durationsum, t.helptype
@@ -720,20 +720,20 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
       $dao = CRM_Core_DAO::executeQuery($helpTypeDurationQuery);
       $i = 0;
       while ($dao->fetch()) {
-        $statistics['counts']['helptype_duration_' . $i++] = array(
+        $statistics['counts']['helptype_duration_' . $i++] = [
           'title' => $indentPrefix . CRM_Utils_Array::value($dao->helptype, $helpTypeLabels, '[NONE SPECIFIED]'),
           'value' => $dao->durationsum,
           // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
           'type' => CRM_Utils_Type::T_INT,
-        );
+        ];
       }
 
-      $statistics['counts']['helptype_frequency_blank'] = array(
+      $statistics['counts']['helptype_frequency_blank'] = [
         'title' => E::ts('Contact frequency per Help Type'),
         'value' => '',
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
 
       $helpTypeFrequencyQuery = "
         select activitycount, count(*) as cnt from (
@@ -755,7 +755,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         $hcHelpTypeCounts[$dao->activitycount] = $dao->cnt;
       }
       for ($i = 1; $i <= 9; $i++) {
-        $statistics['counts']['helptype_frequency_' . $i] = array(
+        $statistics['counts']['helptype_frequency_' . $i] = [
           'title' => $indentPrefix . E::ts("Contacts with %1 \"%2\" activities", [
             1 => $i,
             2 => $hcHelpTypeLabel,
@@ -763,10 +763,10 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
           'value' => $hcHelpTypeCounts[$i] ?? 0,
           // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
           'type' => CRM_Utils_Type::T_INT,
-        );
+        ];
       }
       $i = '10+';
-      $statistics['counts']['helptype_frequency_' . $i] = array(
+      $statistics['counts']['helptype_frequency_' . $i] = [
         'title' => $indentPrefix . E::ts("Contacts with %1 \"%2\" activities", [
           1 => $i,
           2 => $hcHelpTypeLabel,
@@ -774,7 +774,7 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
         'value' => $hcHelpTypeCounts[$i] ?? 0,
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
 
       $onlySeHelpTypeCountQuery = "
         select count(*) as cnt from (
@@ -787,14 +787,14 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
           having helptypes = 'SE'
         ) t
       ";
-      $statistics['counts']['helptype_frequency_SE'] = array(
+      $statistics['counts']['helptype_frequency_SE'] = [
         'title' => $indentPrefix . E::ts("Contacts with only \"%1\" activities", [
           1 => $helpTypeLabels['SE'],
         ]),
         'value' => CRM_Core_DAO::singleValueQuery($onlySeHelpTypeCountQuery),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
 
       $onlyXxHelpTypeCountQuery = "
         select count(*) as cnt from (
@@ -807,35 +807,35 @@ class CRM_Cpreports_Form_Report_Totalcontacthours extends CRM_Report_Form {
           having helptypes = 'XX'
         ) t
       ";
-      $statistics['counts']['helptype_frequency_XX'] = array(
+      $statistics['counts']['helptype_frequency_XX'] = [
         'title' => $indentPrefix . E::ts("Contacts with only \"%1\" activities", [
           1 => $helpTypeLabels['XX'],
         ]),
         'value' => CRM_Core_DAO::singleValueQuery($onlyXxHelpTypeCountQuery),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_INT,
-      );
+      ];
     }
     else {
       // Section header
-      $statistics['counts']['helptype_count_blank'] = array(
+      $statistics['counts']['helptype_count_blank'] = [
         'title' => E::ts('Activity counts per Help Type'),
         'value' => E::ts('(Please enable the "Help Type" column to reveal these statistics.)'),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
-      $statistics['counts']['helptype_duration_blank'] = array(
+      ];
+      $statistics['counts']['helptype_duration_blank'] = [
         'title' => E::ts('Total duration per Help Type'),
         'value' => E::ts('(Please enable the "Help Type" column to reveal these statistics.)'),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
-      $statistics['counts']['helptype_frequency_blank'] = array(
+      ];
+      $statistics['counts']['helptype_frequency_blank'] = [
         'title' => E::ts('Contact frequency per Help Type'),
         'value' => E::ts('(Please enable the "Help Type" column to reveal these statistics.)'),
         // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
         'type' => CRM_Utils_Type::T_STRING,
-      );
+      ];
     }
 
     return $statistics;

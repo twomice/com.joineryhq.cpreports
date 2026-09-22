@@ -15,12 +15,12 @@ function cpreports_civicrm_alterReportVar($varType, &$var, $reportForm) {
       case 'CRM_Report_Form_Contact_Summary':
       case 'CRM_Report_Form_Contact_Detail':
         // Shorthand variable for nickname filter/field properties
-        $nickNameFilterFieldProperties = array(
-          'nick_name' => array(
+        $nickNameFilterFieldProperties = [
+          'nick_name' => [
             'name' => 'nick_name',
             'title' => ts('Nickname'),
-          ),
-        );
+          ],
+        ];
         // We'll insert this filter after the 'sort_name' filter, so first find out the correct position.
         $nickNameFilterPosition = array_search('sort_name', array_keys($var['civicrm_contact']['filters'])) + 1;
         // Insert filter at that position.
