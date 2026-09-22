@@ -59,22 +59,22 @@ class CRM_Cpreports_Form_Report_Cpreport_Clientroster_DurationRelationship exten
             -- <<< sqlbase
       ) t
     ";
-    $statistics['counts']['total_days'] = array(
+    $statistics['counts']['total_days'] = [
       'title' => E::ts("Total of all <em>Days Participated (relationships)</em>"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     //Average duration (based on all Team Clients processed)
     $totalRows = $statistics['counts']['rowsFound']['value'] ?? $statistics['counts']['rowCount']['value'];
     $avgValue = ($statistics['counts']['participation_ended_during']['value'] ? ($statistics['counts']['total_days']['value'] / $totalRows) : 'N/A (none ended during this period)');
-    $statistics['counts']['average_duration'] = array(
+    $statistics['counts']['average_duration'] = [
       'title' => E::ts("Average <em>Days Participated (relationships)</em>"),
       'value' => $avgValue,
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => (is_numeric($avgValue) ? CRM_Utils_Type::T_INT : CRM_Utils_Type::T_STRING),
-    );
+    ];
 
     return $statistics;
   }

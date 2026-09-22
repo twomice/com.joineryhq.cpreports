@@ -24,35 +24,35 @@ class CRM_Cpreports_Utils {
    */
   public static function getTeamColumns($teamLabel = NULL, $options = ['fields', 'filters', 'order_bys']) {
     $teamLabel = $teamLabel ?? 'Team';
-    $ret = array(
-      'civicrm_contact_team' => array(
+    $ret = [
+      'civicrm_contact_team' => [
         'dao' => 'CRM_Contact_DAO_Contact',
         'grouping' => 'contact-fields',
-      ),
-    );
+      ],
+    ];
     if (in_array('fields', $options)) {
-      $ret['civicrm_contact_team']['fields'] = array(
-        'organization_name' => array(
+      $ret['civicrm_contact_team']['fields'] = [
+        'organization_name' => [
           'title' => E::ts("$teamLabel Name"),
           'required' => FALSE,
           'default' => FALSE,
           'grouping' => 'team-fields',
-        ),
-        'nick_name' => array(
+        ],
+        'nick_name' => [
           'title' => E::ts("$teamLabel Nickname"),
           'required' => FALSE,
           'default' => FALSE,
           'grouping' => 'team-fields',
-        ),
-        'id' => array(
+        ],
+        'id' => [
           'no_display' => TRUE,
           'required' => TRUE,
-        ),
-      );
+        ],
+      ];
     }
     if (in_array('filters', $options)) {
       // Build a list of options for the nick_name select filter (all existing team nicknames)
-      $nickNameOptions = array();
+      $nickNameOptions = [];
       $dao = CRM_Core_DAO::executeQuery('
         SELECT DISTINCT nick_name
         FROM civicrm_contact
@@ -66,98 +66,98 @@ class CRM_Cpreports_Utils {
         $nickNameOptions[$dao->nick_name] = $dao->nick_name;
       }
       // Add filters.
-      $ret['civicrm_contact_team']['filters'] = array(
-        'organization_name' => array(
+      $ret['civicrm_contact_team']['filters'] = [
+        'organization_name' => [
           'title' => E::ts("$teamLabel Name"),
           'operator' => 'like',
           'type' => CRM_Utils_Type::T_STRING,
-        ),
-        'nick_name_like' => array(
+        ],
+        'nick_name_like' => [
           'title' => E::ts("$teamLabel Nickname"),
           'dbAlias' => 'contact_team_civireport.nick_name',
           'operator' => 'like',
           'type' => CRM_Utils_Type::T_STRING,
-        ),
-        'nick_name_select' => array(
+        ],
+        'nick_name_select' => [
           'title' => E::ts("$teamLabel Nickname"),
           'dbAlias' => 'contact_team_civireport.nick_name',
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $nickNameOptions,
           'type' => CRM_Utils_Type::T_STRING,
-        ),
-      );
+        ],
+      ];
     }
     if (in_array('order_bys', $options)) {
-      $ret['civicrm_contact_team']['order_bys'] = array(
-        'organization_name' => array(
+      $ret['civicrm_contact_team']['order_bys'] = [
+        'organization_name' => [
           'title' => E::ts("$teamLabel Name"),
-        ),
-      );
+        ],
+      ];
     }
     return $ret;
   }
 
   public static function getAddressColumns() {
-    return array(
-      'civicrm_address' => array(
-        'filters' => array(
-          'address_street_address' => array(
+    return [
+      'civicrm_address' => [
+        'filters' => [
+          'address_street_address' => [
             'title' => E::ts('Street Address'),
             'name' => 'street_address',
-          ),
-          'address_city' => array(
+          ],
+          'address_city' => [
             'title' => E::ts('City'),
             'name' => 'city',
-          ),
-          'address_postal_code' => array(
+          ],
+          'address_postal_code' => [
             'title' => E::ts('Postal Code'),
             'name' => 'postal_code',
-          ),
+          ],
           // This can't be called 'county_id'. If it is, CRM_Report_Form will
           // create a chain-select filter with ALL counties, i.e., if we name  it
           // that then we can't control the available options.
           // So we name it 'the_county_id' and use the `name` parameter to make
           // civireport aware of the correct column to use; this doesn't
           // trigger CRM_Report_Form's "too smart for you" auto-creation of options.
-          'the_county_id' => array(
+          'the_county_id' => [
             'name' => 'county_id',
             'title' => E::ts('County'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_BAO_Address::buildOptions('county_id', NULL, ['state_province_id' => 1042]),
-          ),
-        ),
+          ],
+        ],
         'dao' => 'CRM_Core_DAO_Address',
         'alias' => 'address',
-        'fields' => array(
-          'address_street_address' => array(
+        'fields' => [
+          'address_street_address' => [
             'title' => E::ts('Street Address'),
             'name' => 'street_address',
-          ),
-          'address_supplemental_address_1' => array(
+          ],
+          'address_supplemental_address_1' => [
             'title' => E::ts('Supplementary Address Field 1'),
             'name' => 'supplemental_address_1',
-          ),
-          'address_city' => array(
+          ],
+          'address_city' => [
             'title' => E::ts('City'),
             'name' => 'city',
             'operator' => 'like',
-          ),
-          'address_postal_code' => array(
+          ],
+          'address_postal_code' => [
             'title' => E::ts('Postal Code'),
             'name' => 'postal_code',
-          ),
-          'address_county_id' => array(
+          ],
+          'address_county_id' => [
             'title' => E::ts('County'),
             'name' => 'county_id',
-          ),
-          'address_state_province_id' => array(
+          ],
+          'address_state_province_id' => [
             'title' => E::ts('State/Province'),
             'name' => 'state_province_id',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   public static function alterDisplayTeam(&$rows) {

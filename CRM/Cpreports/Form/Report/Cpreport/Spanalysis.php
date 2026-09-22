@@ -4,88 +4,88 @@ use CRM_Cpreports_ExtensionUtil as E;
 
 class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_Report_Cpreport {
 
-  protected $_customGroupExtends = array('Individual', 'Contact', 'Relationship');
+  protected $_customGroupExtends = ['Individual', 'Contact', 'Relationship'];
   protected $_customGroupGroupBy = FALSE;
 
   public function __construct() {
-    $this->_columns = array(
-      'civicrm_contact_indiv' => array(
+    $this->_columns = [
+      'civicrm_contact_indiv' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
             'required' => TRUE,
             'default' => TRUE,
             'no_repeat' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'contact_id' => array(
+          ],
+          'contact_id' => [
             'title' => E::ts('Contact ID'),
             'name' => 'id',
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => E::ts('First Name'),
-          ),
-          'last_name' => array(
+          ],
+          'last_name' => [
             'title' => E::ts('Last Name'),
-          ),
-          'middle_name' => array(
+          ],
+          'middle_name' => [
             'title' => E::ts('Middle Name'),
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'title' => E::ts('Gender'),
-          ),
-          'prefix_id' => array(
+          ],
+          'prefix_id' => [
             'title' => E::ts('Prefix'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'title' => E::ts('Date of Birth'),
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
             'operator' => 'like',
-          ),
-        ),
-        'order_bys' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'order_bys' => [
+          'sort_name' => [
             'title' => E::ts('Contact Name'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_relationship' => array(
-        'fields' => array(
-          'start_date' => array(
+      ],
+      'civicrm_relationship' => [
+        'fields' => [
+          'start_date' => [
             'title' => E::ts('Start Date'),
             'default' => TRUE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => E::ts('End Date'),
             'default' => TRUE,
-          ),
-          'days_active' => array(
+          ],
+          'days_active' => [
             'title' => E::ts('Days Active'),
             'dbAlias' => 'IF (start_date IS NOT NULL, DATEDIFF(IFNULL(end_date, NOW()), start_date), "")',
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'relationship-fields',
-      ),
-      'civicrm_note' => array(
-        'fields' => array(
-          'note' => array(
+      ],
+      'civicrm_note' => [
+        'fields' => [
+          'note' => [
             'title' => E::ts('Note'),
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'relationship-fields',
-      ),
-    );
+      ],
+    ];
     $this->_addFilterServiceDates();
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -125,7 +125,7 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
 
   public function beginPostProcess() {
     parent::beginPostProcess();
-    foreach (array('relative', 'from', 'to') as $suffix) {
+    foreach (['relative', 'from', 'to'] as $suffix) {
       $this->_params["end_date_" . $suffix] = $this->_params["start_date_" . $suffix] = $this->_params["service_dates_" . $suffix];
     }
   }
@@ -194,38 +194,38 @@ class CRM_Cpreports_Form_Report_Cpreport_Spanalysis extends CRM_Cpreports_Form_R
     $sqlBase = $this->_getSqlBase();
 
     //Net change in active Service Providers
-    $statistics['counts']['net_change'] = array(
+    $statistics['counts']['net_change'] = [
       'title' => E::ts("Net change in active Service Providers"),
       'value' => ($statistics['counts']['active_end']['value'] - $statistics['counts']['active_start']['value']),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     //Total Service Providers processed (Active and Terminated)
     $query = "select count(distinct contact_id_b) from civicrm_relationship where id IN (SELECT {$this->_aliases['civicrm_relationship']}.id {$sqlBase})";
-    $statistics['counts']['total_processed'] = array(
+    $statistics['counts']['total_processed'] = [
       'title' => E::ts("Total Service Providers processed (Active and Terminated)"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     //Total composite duration of all service providers (days)
     $query = "select sum({$this->_columns['civicrm_relationship']['fields']['days_active']['dbAlias']}) {$sqlBase}";
-    $statistics['counts']['total_days'] = array(
+    $statistics['counts']['total_days'] = [
       'title' => E::ts("Total composite duration of all service providers (days)"),
       'value' => CRM_Core_DAO::singleValueQuery($query),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     //Average duration (based on all Service Providers processed
-    $statistics['counts']['average_duration'] = array(
+    $statistics['counts']['average_duration'] = [
       'title' => E::ts("Average duration (based on all Service Providers processed)"),
       'value' => ($statistics['counts']['total_processed']['value'] ? ($statistics['counts']['total_days']['value'] / $statistics['counts']['total_processed']['value']) : 0),
       // e.g. CRM_Utils_Type::T_STRING, default seems to be integer
       'type' => CRM_Utils_Type::T_INT,
-    );
+    ];
 
     return $statistics;
   }
